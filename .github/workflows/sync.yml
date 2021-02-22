@@ -1,5 +1,5 @@
 # File: .github/workflows/repo-sync.yml
-name: sync-LXK9301-scripts
+name: sync-scripts
 on:
   schedule:
     - cron: '1 0,15 * * *'
