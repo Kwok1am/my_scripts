@@ -50,6 +50,7 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+        git pull origin push
         git add .
         git diff --quiet && git diff --staged --quiet || git commit -am '.更新'
     - name: Push Dust
