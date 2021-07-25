@@ -135,3 +135,5 @@
 15 0,12,22 * * * node /scripts/jd_jump.js >> /scripts/logs/jd_jump.log 2>&1
 #京喜财富岛
 5 */1 * * * node /scripts/jd_cfd.js >> /scripts/logs/jd_cfd.log 2>&1
+#京喜财富岛互助
+18 0,1,9,14,18 * * * node /scripts/gua_wealth_island_help.js >> /scripts/logs/gua_wealth_island_help.log 2>&1
