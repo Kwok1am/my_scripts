@@ -1,0 +1,70 @@
+name: jd
+on:
+  schedule:
+    - cron: 5 */2 * * *
+  watch:
+    types: started
+jobs:
+  build:
+    runs-on: Ubuntu-20.04  
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install build dependencies
+      run: |
+        sudo apt install rename -y
+        sudo npm install -g typescript
+    - name: down
+      run: |
+        echo "========= 开始下载smiek2221的脚本 ========="
+        git clone https://github.com/smiek2221/scripts.git  ./smiek2221
+        rm -r ./smiek2221/USER_AGENTS.js
+        mv ./smiek2221/JDJRValidator_Pure.js ./JDJRValidator_Pure.js
+        mv ./smiek2221/ZooFaker_Necklace.js ./ZooFaker_Necklace.js
+        mv ./smiek2221/sign_graphics_validate.js ./sign_graphics_validate.js
+        mv ./smiek2221/gua_wealth_island.js ./jd_cfd.js
+        mv ./smiek2221/gua_wealth_island_help.js ./jd_cfd_help.js
+        mv ./smiek2221/jd_necklace.js ./jd_necklace.js
+        #echo "========= 给js添加作者名称 ========="
+        #rename 's/\.js/smiek2221.js/' ./smiek2221/*
+        #cp -f ./smiek2221/*_*.js ./
+        rm -rf ./smiek2221
+        echo "========= 开始下载cdle的脚本 ========="
+        git clone https://github.com/cdle/jd_study.git  ./cdle
+        rm -r ./cdle/jd_cash_exchange.js ./cdle/jd_earn30.js
+        echo "========= 给js添加作者名称 ========="
+        rename 's/\.js/cdle.js/' ./cdle/*
+        cp -f ./cdle/*_*.js ./
+        rm -rf ./cdle
+        #echo "========= 开始下载Wenmoux的脚本 ========="
+        #git clone -b wen https://github.com/Wenmoux/scripts.git ./Wenmoux
+        #mv ./Wenmoux/jd/chinnkarahoi_jd_bookshop.js ./jd_bookshopWenmoux.js
+        #echo "========= 给js添加作者名称 ========="
+        #rename 's/\.js/wenmoux.js/' ./Wenmoux/jd/*
+        #cp -f ./Wenmoux/jd/*_*.js ./
+        #rm -rf ./Wenmoux
+        echo "========= 开始下载JDHelloWorld的脚本 ========="
+        git clone -b main https://github.com/JDHelloWorld/jd_scripts.git ./JDHelloWorld
+        rm -r ./JDHelloWorld/jd_cfd*.ts ./JDHelloWorld/jd_getUp.ts  
+        mv ./JDHelloWorld/githubAction.md ./githubAction.md
+        mv ./JDHelloWorld/tools/*.js ./tools/
+        cd ./JDHelloWorld
+        echo "========= 开始安装依赖 ========="
+        sudo npm install
+        echo "========= 开始转换JDHelloWorld的ts ========="
+        tsc ./*.ts
+        cd ..
+        cp -f ./JDHelloWorld/*_*.js ./
+        cp -f ./JDHelloWorld/*_*.ts ./activity
+        rm -rf ./JDHelloWorld
+    - name: 'Commit Files'
+      id: commit
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git diff --quiet && git diff --staged --quiet || git commit -am '.更新'
+    - name: Push Dust
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.PAT }}
+        branch: master
