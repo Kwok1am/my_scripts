@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getFarmShareCode = exports.getBeanShareCode = exports.TotalBean = void 0;
+exports.getRandomNumberByRange = exports.wait = exports.requireConfig = exports.getFarmShareCode = exports.getBeanShareCode = exports.TotalBean = void 0;
 var axios_1 = require("axios");
 var USER_AGENTS = [
     "jdapp;android;10.0.2;10;network/wifi;Mozilla/5.0 (Linux; Android 10; ONEPLUS A5010 Build/QKQ1.191014.012; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045230 Mobile Safari/537.36",
@@ -79,12 +79,14 @@ var USER_AGENTS = [
 function getRandomNumberByRange(start, end) {
     return Math.floor(Math.random() * (end - start) + start);
 }
+exports.getRandomNumberByRange = getRandomNumberByRange;
 var USER_AGENT = USER_AGENTS[getRandomNumberByRange(0, USER_AGENTS.length)];
 function getBeanShareCode(cookie) {
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function () {
         var data;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0: return [4 /*yield*/, axios_1["default"].post('https://api.m.jd.com/client.action', "functionId=plantBeanIndex&body=" + escape(JSON.stringify({ version: "9.0.0.1", "monitor_source": "plant_app_plant_index", "monitor_refer": "" })) + "&appid=ld&client=apple&area=5_274_49707_49973&build=167283&clientVersion=9.1.0", {
                         headers: {
                             Cookie: cookie,
@@ -95,8 +97,8 @@ function getBeanShareCode(cookie) {
                         }
                     })];
                 case 1:
-                    data = (_a.sent()).data;
-                    if (data.data.jwordShareInfo.shareUrl)
+                    data = (_c.sent()).data;
+                    if ((_b = (_a = data.data) === null || _a === void 0 ? void 0 : _a.jwordShareInfo) === null || _b === void 0 ? void 0 : _b.shareUrl)
                         return [2 /*return*/, data.data.jwordShareInfo.shareUrl.split('Uuid=')[1]];
                     else
                         return [2 /*return*/, ''];
@@ -171,4 +173,27 @@ function TotalBean(cookie) {
     });
 }
 exports.TotalBean = TotalBean;
+function requireConfig() {
+    var cookiesArr = [];
+    return new Promise(function (resolve) {
+        console.log('开始获取配置文件\n');
+        var jdCookieNode = require('./jdCookie.js');
+        Object.keys(jdCookieNode).forEach(function (item) {
+            if (jdCookieNode[item]) {
+                cookiesArr.push(jdCookieNode[item]);
+            }
+        });
+        console.log("\u5171" + cookiesArr.length + "\u4E2A\u4EAC\u4E1C\u8D26\u53F7\n");
+        resolve(cookiesArr);
+    });
+}
+exports.requireConfig = requireConfig;
+function wait(t) {
+    return new Promise(function (resolve) {
+        setTimeout(function () {
+            resolve();
+        }, t);
+    });
+}
+exports.wait = wait;
 exports["default"] = USER_AGENT;
