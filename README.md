@@ -27,8 +27,12 @@
 
 * [@liuxiaoyucc](https://github.com/liuxiaoyucc)
 
-* [@Zero-S1](https://github.com/Zero-S1)
+* [@cdle](https://github.com/cdle/jd_study)
 
-* [@uniqueque](https://github.com/uniqueque)
+* [@smiek2221](https://github.com/smiek2221/scripts)
 
-* [@nzw9314](https://github.com/nzw9314)
+* [@Wenmoux](https://github.com/Wenmoux/scripts)
+
+* [@JDHelloWorld](https://github.com/JDHelloWorld/jd_scripts)
+
+* [@star261](https://github.com/star261/jd)
