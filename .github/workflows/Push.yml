@@ -24,6 +24,7 @@ jobs:
         mv ./smiek2221/gua_wealth_island.js ./jd_cfd.js
         mv ./smiek2221/gua_wealth_island_help.js ./jd_cfd_help.js
         mv ./smiek2221/jd_necklace.js ./jd_necklace.js
+        mv ./smiek2221/jd_qcshj.js ./jd_qcshj.js
         mv ./smiek2221/gua_doge.js ./gua_doge.js
         mv ./smiek2221/gua_carnivalcity.js ./gua_carnivalcity.js
         mv ./smiek2221/gua_opencard*.js ./
