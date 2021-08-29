@@ -30,13 +30,13 @@ jobs:
         #rename 's/\.js/smiek2221.js/' ./smiek2221/*
         #cp -f ./smiek2221/*_*.js ./
         rm -rf ./smiek2221
-        echo "========= 开始下载cdle的脚本 ========="
-        git clone https://github.com/cdle/xdd.git  ./cdle
-        rm -r ./cdle/scripts/jd_cash_exchange.js ./cdle/scripts/jd_earn30.js ./cdle/scripts/USER_AGENTS.js
-        echo "========= 给js添加作者名称 ========="
-        rename 's/\.js/cdle.js/' ./cdle/scripts/*
-        cp -f ./cdle/scripts/*_*.js ./
-        rm -rf ./cdle
+        #echo "========= 开始下载cdle的脚本 ========="
+        #git clone https://github.com/cdle/xdd.git  ./cdle
+        #rm -r ./cdle/scripts/jd_cash_exchange.js ./cdle/scripts/jd_earn30.js ./cdle/scripts/USER_AGENTS.js
+        #echo "========= 给js添加作者名称 ========="
+        #rename 's/\.js/cdle.js/' ./cdle/scripts/*
+        #cp -f ./cdle/scripts/*_*.js ./
+        #rm -rf ./cdle
         echo "========= 开始下载star261的脚本 ========="
         git clone -b main https://github.com/star261/jd.git  ./star261
         mv ./star261/scripts/jd_jxmc.js ./jd_jxmc.js
