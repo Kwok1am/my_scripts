@@ -51,8 +51,12 @@ jobs:
         echo "========= 开始下载JDHelloWorld的脚本 ========="
         git clone -b main https://github.com/JDHelloWorld/jd_scripts.git ./JDHelloWorld
         rm -r ./JDHelloWorld/jd_cfd*.ts ./JDHelloWorld/jd_getUp.ts  ./JDHelloWorld/jd_jxmc.ts
+        rm -rf ./JDHelloWorld/jd_getShareCodes.ts
         mv ./JDHelloWorld/githubAction.md ./githubAction.md
+        mv ./JDHelloWorld/sendNotify.js ./sendNotify.js
+        mv ./JDHelloWorld/tools/*.json ./tools/
         mv ./JDHelloWorld/tools/*.js ./tools/
+        mv ./JDHelloWorld/tools/*.ts ./tools/
         cd ./JDHelloWorld
         echo "========= 开始安装依赖 ========="
         sudo npm install
