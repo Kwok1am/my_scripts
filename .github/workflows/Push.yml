@@ -54,9 +54,9 @@ jobs:
         rm -rf ./JDHelloWorld/jd_getShareCodes.ts ./JDHelloWorld/jd_jxgc_help.ts
         mv ./JDHelloWorld/githubAction.md ./githubAction.md
         mv ./JDHelloWorld/sendNotify.js ./sendNotify.js
-        mv ./JDHelloWorld/tools/*.json ./utils/
-        mv ./JDHelloWorld/tools/*.js ./utils/
-        mv ./JDHelloWorld/tools/*.ts ./utils/
+        mv ./JDHelloWorld/utils/*.json ./utils/
+        mv ./JDHelloWorld/utils/*.js ./utils/
+        mv ./JDHelloWorld/utils/*.ts ./utils/
         cd ./JDHelloWorld
         echo "========= 开始安装依赖 ========="
         sudo npm install
