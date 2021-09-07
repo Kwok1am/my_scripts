@@ -131,7 +131,7 @@ var cookie = '', res = '', UserName;
                     }
                 }
                 if (!message) return [3 /*break*/, 11];
-                return [4 /*yield*/, notify.sendNotify('京喜牧场兑换', message, '', '\n\n你好，世界！')];
+                return [4 /*yield*/, notify.sendNotify('京喜牧场兑换', message)];
             case 10:
                 _h.sent();
                 _h.label = 11;
