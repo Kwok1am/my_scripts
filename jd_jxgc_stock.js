@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * 显示京喜工厂当前可生产商品
+ * cron: 0 * * * *
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -36,71 +40,72 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-/**
- * 每天检测cookie是否有效
- * cron: 10 * * * *
- */
 var axios_1 = require("axios");
 var TS_USER_AGENTS_1 = require("./TS_USER_AGENTS");
-var notify = require('./sendNotify');
-var cookie = '', UserName, index, errMsg = '';
+var sendNotify_1 = require("./sendNotify");
+var fs_1 = require("fs");
+var cookie = '', res = '', UserName, message = '';
 !(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var cookiesArr, i;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
+    var cookiesArr, exist, current, _i, _a, t;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requestAlgo)(10001)];
             case 1:
-                cookiesArr = _a.sent();
-                i = 0;
-                _a.label = 2;
+                _b.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
             case 2:
-                if (!(i < cookiesArr.length)) return [3 /*break*/, 5];
-                cookie = cookiesArr[i];
+                cookiesArr = _b.sent();
+                cookie = cookiesArr[0];
                 UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)[1]);
-                index = i + 1;
-                return [4 /*yield*/, api(index, cookie, UserName)];
+                console.log("\n\u5F00\u59CB\u3010\u4EAC\u4E1C\u8D26\u53F71\u3011" + UserName + "\n");
+                try {
+                    (0, fs_1.accessSync)('jxgc_stock.json');
+                    exist = JSON.parse((0, fs_1.readFileSync)('jxgc_stock.json').toString());
+                }
+                catch (e) {
+                    exist = [];
+                }
+                return [4 /*yield*/, api()];
             case 3:
-                _a.sent();
-                _a.label = 4;
-            case 4:
-                i++;
-                return [3 /*break*/, 2];
-            case 5:
-                if (!errMsg) return [3 /*break*/, 7];
-                return [4 /*yield*/, notify.sendNotify("Cookie失效", errMsg, '', '你好，世界！')];
-            case 6:
-                _a.sent();
-                _a.label = 7;
-            case 7: return [2 /*return*/];
+                res = _b.sent();
+                current = [];
+                for (_i = 0, _a = res.data.commodityList; _i < _a.length; _i++) {
+                    t = _a[_i];
+                    console.log(t.name);
+                    current.push(t.name);
+                    if (!exist.includes(t.name)) {
+                        message += t.name + '\n';
+                    }
+                }
+                (0, fs_1.writeFileSync)('./jxgc_stock.json', JSON.stringify(current));
+                if (message) {
+                    console.log('send...');
+                    (0, sendNotify_1.sendNotify)('京喜工厂可生产', message);
+                }
+                return [2 /*return*/];
         }
     });
 }); })();
-function api(index, cookie, username) {
+function api() {
     return __awaiter(this, void 0, void 0, function () {
-        var data;
+        var url, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, axios_1["default"].get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion", {
-                        headers: {
-                            Host: "me-api.jd.com",
-                            Connection: "keep-alive",
-                            Cookie: cookie,
-                            "User-Agent": TS_USER_AGENTS_1["default"],
-                            "Accept-Language": "zh-cn",
-                            "Referer": "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&",
-                            "Accept-Encoding": "gzip, deflate, br"
-                        }
-                    })];
+                case 0:
+                    url = "https://wq.jd.com/dreamfactory/diminfo/GetCommodityList?zone=dream_factory&flag=2&pageNo=1&pageSize=12&_time=" + Date.now() + "&_stk=_time%2Cflag%2CpageNo%2CpageSize%2Czone&_ste=1&_=" + Date.now() + "&sceneval=2";
+                    url = (0, TS_USER_AGENTS_1.h5st)(url, '_time,flag,pageNo,pageSize,zone', {}, 10001);
+                    return [4 /*yield*/, axios_1["default"].get(url, {
+                            headers: {
+                                'Host': 'wq.jd.com',
+                                "User-Agent": TS_USER_AGENTS_1["default"],
+                                'accept-language': 'zh-cn',
+                                'referer': 'https://wqsd.jd.com/pingou/dream_factory/index.html',
+                                'cookie': cookie
+                            }
+                        })];
                 case 1:
                     data = (_a.sent()).data;
-                    if (data.retcode === '0') {
-                        console.log(index, '✅', username);
-                    }
-                    else {
-                        console.log(index, '❌', username);
-                        errMsg += index + " " + username + "\n";
-                    }
-                    return [2 /*return*/];
+                    return [2 /*return*/, data];
             }
         });
     });
