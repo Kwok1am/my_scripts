@@ -50,7 +50,7 @@ jobs:
         echo "========= 开始下载JDHelloWorld的脚本 ========="
         git clone -b main https://github.com/JDHelloWorld/jd_scripts.git ./JDHelloWorld
         rm -r ./JDHelloWorld/jd_cfd*.ts ./JDHelloWorld/jd_getUp.ts  ./JDHelloWorld/jd_jxmc.ts 
-        rm -rf ./JDHelloWorld/jd_getShareCodes.ts ./JDHelloWorld/jd_jxgc_help.ts ./JDHelloWorld/jd_joy_reward ./JDHelloWorld/jd_qq_pasture
+        rm -rf ./JDHelloWorld/jd_getShareCodes.ts ./JDHelloWorld/jd_jxgc_help.ts ./JDHelloWorld/jd_joy_reward.ts ./JDHelloWorld/jd_qq_pasture.ts
         mv ./JDHelloWorld/githubAction.md ./githubAction.md
         cp -f ./JDHelloWorld/sendNotify.js ./sendNotify.js
         mv ./JDHelloWorld/utils/*.json ./utils/
