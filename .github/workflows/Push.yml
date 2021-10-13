@@ -23,7 +23,6 @@ jobs:
         mv ./smiek2221/sign_graphics_validate.js ./sign_graphics_validate.js
         mv ./smiek2221/gua_wealth_island.js ./jd_cfd.js
         mv ./smiek2221/gua_wealth_island_help.js ./jd_cfd_help.js
-        mv ./smiek2221/jd_necklace.js ./jd_necklace.js
         mv ./smiek2221/jd_sign_graphics.js ./jd_sign_graphics.js
         mv ./smiek2221/gua_*.js ./
         #echo "========= 给js添加作者名称 ========="
