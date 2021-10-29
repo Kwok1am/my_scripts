@@ -15,16 +15,16 @@ jobs:
         sudo npm install -g typescript
     - name: down
       run: |
-        echo "========= 开始下载smiek2221的脚本 ========="
-        git clone https://github.com/smiek2221/scripts.git  ./smiek2221
-        rm -r ./smiek2221/USER_AGENTS.js
-        mv ./smiek2221/JDJRValidator_Pure.js ./JDJRValidator_Pure.js
-        mv ./smiek2221/ZooFaker_Necklace.js ./ZooFaker_Necklace.js
-        mv ./smiek2221/sign_graphics_validate.js ./sign_graphics_validate.js
-        mv ./smiek2221/gua_wealth_island.js ./jd_cfd.js
-        mv ./smiek2221/gua_wealth_island_help.js ./jd_cfd_help.js
-        mv ./smiek2221/jd_sign_graphics.js ./jd_sign_graphics.js
-        mv ./smiek2221/gua_*.js ./
+        #echo "========= 开始下载smiek2221的脚本 ========="
+        #git clone https://github.com/smiek2221/scripts.git  ./smiek2221
+        #rm -r ./smiek2221/USER_AGENTS.js
+        #mv ./smiek2221/JDJRValidator_Pure.js ./JDJRValidator_Pure.js
+        #mv ./smiek2221/ZooFaker_Necklace.js ./ZooFaker_Necklace.js
+        #mv ./smiek2221/sign_graphics_validate.js ./sign_graphics_validate.js
+        #mv ./smiek2221/gua_wealth_island.js ./jd_cfd.js
+        #mv ./smiek2221/gua_wealth_island_help.js ./jd_cfd_help.js
+        #mv ./smiek2221/jd_sign_graphics.js ./jd_sign_graphics.js
+        #mv ./smiek2221/gua_*.js ./
         #echo "========= 给js添加作者名称 ========="
         #rename 's/\.js/smiek2221.js/' ./smiek2221/*
         #cp -f ./smiek2221/*_*.js ./
