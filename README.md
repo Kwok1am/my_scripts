@@ -29,7 +29,7 @@
 
 * [@cdle](https://github.com/cdle/jd_study)
 
-* [@smiek2221](https://github.com/smiek2221/scripts)
+* [@smiek2221](https://github.com/smiek2121/scripts)
 
 * [@Wenmoux](https://github.com/Wenmoux/scripts)
 
