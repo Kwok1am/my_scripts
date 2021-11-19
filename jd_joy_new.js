@@ -1,736 +1,390 @@
+"use strict";
 /**
- 更新时间：2021-09-30
- cron: 0 0-23/2 * * *
- export feedNum=80
- export JD_JOY_teamLevel=2
+ * 宠汪汪三代目
+ * cron: 0 0-23/3 * * *
+ *
+ * follow_fail就停
  */
-
-const $ = new Env("宠汪汪二代目")
-console.log('\n====================Hello World====================\n')
-
-const injectToRequest = require("./utils/jd_joy_validate").injectToRequest, USER_AGENT = require("./USER_AGENTS").USER_AGENT, md5 = require('md5')
-
-let cookiesArr = [], cookie = '', notify;
-let invokeKey = 'q8DNJdpcfRQ69gIx';
-
-$.get = injectToRequest($.get.bind($))
-$.post = injectToRequest($.post.bind($))
-
-!(async () => {
-  await requireConfig();
-  for (let i = 0; i < cookiesArr.length; i++) {
-    if (cookiesArr[i]) {
-      cookie = cookiesArr[i];
-      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
-      $.index = i + 1;
-      if (!require('./JS_USER_AGENTS').HelloWorld) {
-        console.log(`\n【京东账号${$.index}】${$.nickName || $.UserName}：运行环境检测失败\n`);
-        break
-      }
-      console.log(`\n开始【京东账号${$.index}】${$.UserName}\n`);
-
-      let res = await api('gift/getBeanConfigs');
-      try {
-        console.log('现有积分：', res.data.petCoin)
-      } catch (e) {
-        console.log('没有获取到积分余额')
-        continue
-      }
-
-      await getFriends();
-
-      await run('detail/v2');
-      await run();
-      // await feed();
-
-      let tasks = await api('pet/getPetTaskConfig');
-      for (let tp of tasks.datas) {
-        console.log(tp.taskName, tp.receiveStatus)
-        if (tp.receiveStatus === 'unreceive') {
-          await award(tp.taskType);
-          await $.wait(3000);
-        }
-        if (tp.taskName === '浏览频道') {
-          let followChannelList = await api('pet/getFollowChannels');
-          for (let t of followChannelList['datas']) {
-            if (!t.status) {
-              console.log('┖', t['channelName'])
-              await beforeTask('follow_channel', t.channelId);
-              await $.wait(1000)
-              await doTask(JSON.stringify({"channelId": t.channelId, "taskType": 'FollowChannel'}))
-              await $.wait(6000)
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
             }
-          }
-        }
-
-        if (tp.taskName === '逛会场') {
-          for (let t of tp.scanMarketList) {
-            if (!t.status) {
-              console.log('┖', t.marketName)
-              await beforeTask('scan_market', encodeURIComponent(t.marketLink || t.marketLinkH5))
-              await $.wait(1000)
-              await doTask(JSON.stringify({
-                "marketLink": t.marketLink || t.marketLinkH5,
-                "taskType": "ScanMarket"
-              }), 'scan')
-              await $.wait(6000)
-            }
-          }
-        }
-
-        if (tp.taskName === '关注商品') {
-          for (let t of tp.followGoodList) {
-            if (!t.status) {
-              console.log('┖', t.skuName)
-              await beforeTask('follow_good', t.sku)
-              await $.wait(1000)
-              await doTask(`sku=${t.sku}`, 'followGood')
-              await $.wait(6000)
-            }
-          }
-        }
-
-        if (tp.taskName === '关注店铺') {
-          await $.wait(10000)
-          for (let t of tp.followShops.reverse()) {
-            if (!t.status) {
-              await beforeTask('follow_shop', t.shopId);
-              await $.wait(1000);
-              await followShop(t.shopId)
-              await $.wait(6000);
-            }
-          }
-        }
-      }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-  }
-})()
-
-function api(fn) {
-  return new Promise(resolve => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + invokeKey + lkt).toString()
-    $.get({
-      url: `https://draw.jdfcloud.com//common/${fn}?reqSource=weapp&invokeKey=${invokeKey}`,
-      headers: {
-        'lkt': lkt,
-        'lks': lks,
-        'Host': 'draw.jdfcloud.com',
-        'content-type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.16(0x18001027) NetType/WIFI Language/zh_CN',
-        'Referer': 'https://servicewechat.com/wxccb5c536b0ecd1bf/770/page-frame.html',
-        'Cookie': cookie,
-      },
-    }, (err, resp, data) => {
-      try {
-        resolve(JSON.parse(data))
-      } catch (e) {
-        resolve(e)
-      }
-    })
-  })
+};
+exports.__esModule = true;
+var axios_1 = require("axios");
+var TS_USER_AGENTS_1 = require("./TS_USER_AGENTS");
+var ts_md5_1 = require("ts-md5");
+var cookie = '', res = '', UserName, index, invokeKey = 'q8DNJdpcfRQ69gIx';
+!(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var cookiesArr, i, _i, _a, t, _b, _c, task, _d, _e, task, _f, _g, task;
+    return __generator(this, function (_h) {
+        switch (_h.label) {
+            case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
+            case 1:
+                cookiesArr = _h.sent();
+                i = 0;
+                _h.label = 2;
+            case 2:
+                if (!(i < cookiesArr.length)) return [3 /*break*/, 38];
+                cookie = cookiesArr[i];
+                UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)[1]);
+                index = i + 1;
+                console.log("\n\u5F00\u59CB\u3010\u4EAC\u4E1C\u8D26\u53F7".concat(index, "\u3011").concat(UserName, "\n"));
+                return [4 /*yield*/, api('pet/getPetTaskConfig')];
+            case 3:
+                /*
+                await beforeFeed()
+                await wait(1000)
+                res = await feed()
+                if (res.errorCode === 'feed_ok') {
+                  console.log('喂食成功', 80)
+                } else {
+                  console.log('喂食失败', res)
+                }
+                await wait(2000)
+            
+                 */
+                res = _h.sent();
+                _i = 0, _a = res.datas;
+                _h.label = 4;
+            case 4:
+                if (!(_i < _a.length)) return [3 /*break*/, 37];
+                t = _a[_i];
+                if (!(t.receiveStatus === 'unreceive')) return [3 /*break*/, 7];
+                console.log('可领奖:', t.taskName);
+                return [4 /*yield*/, api('pet/getFood', t.taskType)];
+            case 5:
+                res = _h.sent();
+                if (res.errorCode === 'received') {
+                    console.log('已领取:', res.data);
+                }
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
+            case 6:
+                _h.sent();
+                _h.label = 7;
+            case 7:
+                if (!(t.taskName === '浏览频道')) return [3 /*break*/, 20];
+                return [4 /*yield*/, beforeFeed('follow_channel')];
+            case 8:
+                _h.sent();
+                return [4 /*yield*/, click('follow_channel')];
+            case 9:
+                _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(1000)];
+            case 10:
+                _h.sent();
+                return [4 /*yield*/, api('pet/getFollowChannels')];
+            case 11:
+                res = _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
+            case 12:
+                _h.sent();
+                _b = 0, _c = res.datas;
+                _h.label = 13;
+            case 13:
+                if (!(_b < _c.length)) return [3 /*break*/, 20];
+                task = _c[_b];
+                if (!!task.status) return [3 /*break*/, 19];
+                console.log('浏览频道', task.channelName);
+                return [4 /*yield*/, click('follow_channel', task.channelId)];
+            case 14:
+                _h.sent();
+                return [4 /*yield*/, beforeTask('follow_channel', task.channelId)];
+            case 15:
+                _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(6000)];
+            case 16:
+                _h.sent();
+                return [4 /*yield*/, doTask('scan', { "channelId": task.channelId, "taskType": 'FollowChannel' })];
+            case 17:
+                _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(1000)];
+            case 18:
+                _h.sent();
+                _h.label = 19;
+            case 19:
+                _b++;
+                return [3 /*break*/, 13];
+            case 20:
+                if (!(t.taskName === '逛会场')) return [3 /*break*/, 28];
+                _d = 0, _e = t.scanMarketList;
+                _h.label = 21;
+            case 21:
+                if (!(_d < _e.length)) return [3 /*break*/, 28];
+                task = _e[_d];
+                if (!!task.status) return [3 /*break*/, 27];
+                console.log('逛逛会场', task.marketName);
+                return [4 /*yield*/, beforeTask('scan_market', encodeURIComponent(task.marketLink || task.marketLinkH5))];
+            case 22:
+                _h.sent();
+                return [4 /*yield*/, click('scan_market', encodeURIComponent(task.marketLink || task.marketLinkH5))];
+            case 23:
+                _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(6000)];
+            case 24:
+                _h.sent();
+                return [4 /*yield*/, doTask('scan', { "marketLink": task.marketLink || task.marketLinkH5, "taskType": "ScanMarket" })];
+            case 25:
+                _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
+            case 26:
+                _h.sent();
+                _h.label = 27;
+            case 27:
+                _d++;
+                return [3 /*break*/, 21];
+            case 28:
+                if (!(t.taskName === '关注商品')) return [3 /*break*/, 36];
+                _f = 0, _g = t.followGoodList;
+                _h.label = 29;
+            case 29:
+                if (!(_f < _g.length)) return [3 /*break*/, 36];
+                task = _g[_f];
+                if (!!task.status) return [3 /*break*/, 35];
+                console.log('关注商品', task.skuName);
+                return [4 /*yield*/, beforeTask('follow_good', task.sku)];
+            case 30:
+                _h.sent();
+                return [4 /*yield*/, click('follow_good', task.sku)];
+            case 31:
+                _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(6000)];
+            case 32:
+                _h.sent();
+                return [4 /*yield*/, doTask('followGood', "sku=".concat(task.sku))];
+            case 33:
+                _h.sent();
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(1000)];
+            case 34:
+                _h.sent();
+                _h.label = 35;
+            case 35:
+                _f++;
+                return [3 /*break*/, 29];
+            case 36:
+                _i++;
+                return [3 /*break*/, 4];
+            case 37:
+                i++;
+                return [3 /*break*/, 2];
+            case 38: return [2 /*return*/];
+        }
+    });
+}); })();
+function api(fn, taskType) {
+    return __awaiter(this, void 0, void 0, function () {
+        var lkt, lks, url, data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    lkt = Date.now();
+                    lks = ts_md5_1.Md5.hashStr('' + invokeKey + lkt);
+                    url = taskType
+                        ? "https://jdjoy.jd.com/common/".concat(fn, "?reqSource=h5&invokeKey=").concat(invokeKey, "&taskType=").concat(taskType)
+                        : "https://jdjoy.jd.com/common/".concat(fn, "?reqSource=h5&invokeKey=").concat(invokeKey);
+                    return [4 /*yield*/, axios_1["default"].get(url, {
+                            headers: {
+                                'Host': 'jdjoy.jd.com',
+                                'Accept': '*/*',
+                                'lkt': lkt.toString(),
+                                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                                'Content-Type': 'application/json',
+                                'Origin': 'https://h5.m.jd.com',
+                                'User-Agent': TS_USER_AGENTS_1["default"],
+                                'lks': lks,
+                                'Referer': 'https://h5.m.jd.com/',
+                                'Cookie': cookie
+                            }
+                        })];
+                case 1:
+                    data = (_a.sent()).data;
+                    return [2 /*return*/, data];
+            }
+        });
+    });
 }
-
-function beforeTask(fn, shopId) {
-  return new Promise(resolve => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + invokeKey + lkt).toString()
-    $.get({
-      url: `https://draw.jdfcloud.com//common/pet/icon/click?iconCode=${fn}&linkAddr=${shopId}&reqSource=weapp&invokeKey=${invokeKey}`,
-      headers: {
-        lkt: lkt,
-        lks: lks,
-        'Host': 'draw.jdfcloud.com',
-        'Connection': 'keep-alive',
-        'content-type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.16(0x18001027) NetType/WIFI Language/zh_CN',
-        'Referer': 'https://servicewechat.com/wxccb5c536b0ecd1bf/770/page-frame.html',
-        'Cookie': cookie
-      }
-    }, (err, resp, data) => {
-      data = $.toObj(data)
-      if (data.errorCode === null)
-        console.log('before task: OK');
-      else
-        console.log('before task Error:', data);
-      resolve();
-    })
-  })
+function beforeFeed(fn) {
+    if (fn === void 0) { fn = 'feed'; }
+    return __awaiter(this, void 0, void 0, function () {
+        var lkt, lks, data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    lkt = Date.now();
+                    lks = ts_md5_1.Md5.hashStr('' + invokeKey + lkt);
+                    return [4 /*yield*/, axios_1["default"].get("https://jdjoy.jd.com/common/pet/icon/click1?iconCode=".concat(fn, "&reqSource=h5&invokeKey=").concat(invokeKey), {
+                            headers: {
+                                'Host': 'jdjoy.jd.com',
+                                'lkt': lkt.toString(),
+                                'Origin': 'https://h5.m.jd.com',
+                                'User-Agent': TS_USER_AGENTS_1["default"],
+                                'lks': lks,
+                                'Referer': 'https://h5.m.jd.com/',
+                                'Content-Type': 'application/json',
+                                'Cookie': cookie
+                            }
+                        })];
+                case 1:
+                    data = (_a.sent()).data;
+                    return [2 /*return*/, data];
+            }
+        });
+    });
 }
-
-function followShop(shopId) {
-  return new Promise(resolve => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + invokeKey + lkt).toString()
-    $.post({
-      url: `https://draw.jdfcloud.com//common/pet/followShop?reqSource=weapp&invokeKey=${invokeKey}`,
-      headers: {
-        lkt: lkt,
-        lks: lks,
-        'Host': 'draw.jdfcloud.com',
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.16(0x18001027) NetType/WIFI Language/zh_CN',
-        'Referer': 'https://servicewechat.com/wxccb5c536b0ecd1bf/770/page-frame.html',
-        'Cookie': cookie
-      },
-      body: `shopId=${shopId}`
-    }, (err, resp, data) => {
-      console.log(data)
-      resolve();
-    })
-  })
-}
-
-function doTask(body, fnId = 'scan') {
-  return new Promise(resolve => {
-    let contentType
-    let lkt = new Date().getTime()
-    let lks = md5('' + invokeKey + lkt).toString()
-    if (fnId === 'followGood' || fnId === 'followShop') {
-      contentType = 'application/x-www-form-urlencoded'
-    } else {
-      contentType = 'application/json'
-    }
-    $.post({
-      url: `https://draw.jdfcloud.com//common/pet/${fnId}?reqSource=weapp&invokeKey=${invokeKey}`,
-      headers: {
-        'lkt': lkt,
-        'lks': lks,
-        'Host': 'draw.jdfcloud.com',
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.16(0x18001027) NetType/WIFI Language/zh_CN',
-        'Referer': 'https://servicewechat.com/wxccb5c536b0ecd1bf/770/page-frame.html',
-        'Content-Type': contentType,
-        'Cookie': cookie
-      },
-      body: body
-    }, (err, resp, data) => {
-      if (err)
-        console.log('\tdoTask() Error:', err)
-      try {
-        data = JSON.parse(data);
-        data.success ? console.log('\t任务成功') : console.log('\t任务失败', JSON.stringify(data))
-      } catch (e) {
-        $.logErr(e);
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
 function feed() {
-  let feedNum = process.env.feedNum ? process.env.feedNum * 1 : 80
-  return new Promise(resolve => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + invokeKey + lkt).toString()
-    $.get({
-      url: `https://draw.jdfcloud.com//common/pet/feed?feedCount=${feedNum}&invokeKey=${invokeKey}`,
-      headers: {
-        'lkt': lkt,
-        'lks': lks,
-        'Host': 'draw.jdfcloud.com',
-        'Connection': 'keep-alive',
-        'content-type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 12_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.16(0x18001027) NetType/WIFI Language/zh_CN',
-        'Referer': 'https://servicewechat.com/wxccb5c536b0ecd1bf/770/page-frame.html',
-        'Cookie': cookie
-      },
-      body: JSON.stringify({})
-    }, (err, resp, data) => {
-      try {
-        console.log(data)
-        data = JSON.parse(data)
-      } catch (e) {
-        console.log(e)
-      } finally {
-        resolve()
-      }
-    })
-  })
-}
-
-function award(taskType) {
-  return new Promise(resolve => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + 'q8DNJdpcfRQ69gIx' + lkt).toString()
-    $.get({
-      url: `https://jdjoy.jd.com/common/pet/getFood?reqSource=h5&invokeKey=q8DNJdpcfRQ69gIx&taskType=${taskType}`,
-      headers: {
-        'lkt': lkt,
-        'lks': lks,
-        'Host': 'jdjoy.jd.com',
-        'accept': '*/*',
-        'content-type': 'application/x-www-form-urlencoded',
-        'origin': 'https://h5.m.jd.com',
-        "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-        'referer': 'https://h5.m.jd.com/',
-        'Content-Type': 'application/json; charset=UTF-8',
-        'cookie': cookie
-      },
-    }, (err, resp, data) => {
-      try {
-        data = JSON.parse(data);
-        data.errorCode === 'received' ? console.log('任务完成:', data.data) : console.log('\t任务失败:', data)
-      } catch (e) {
-        $.logErr(e);
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-function run(fn = 'match') {
-  let level = process.env.JD_JOY_teamLevel ? process.env.JD_JOY_teamLevel : 2
-  return new Promise(resolve => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + 'q8DNJdpcfRQ69gIx' + lkt).toString()
-    $.get({
-      url: `https://jdjoy.jd.com/common/pet/combat/${fn}?teamLevel=${level}&reqSource=h5&invokeKey=q8DNJdpcfRQ69gIx`,
-      headers: {
-        'lkt': lkt,
-        'lks': lks,
-        'Host': 'jdjoy.jd.com',
-        'origin': 'https://h5.m.jd.com',
-        'referer': 'https://h5.m.jd.com/babelDiy/Zeus/2wuqXrZrhygTQzYA7VufBEpj4amH/index.html',
-        "User-Agent": USER_AGENT,
-        'cookie': cookie
-      },
-    }, async (err, resp, data) => {
-      try {
-        if (fn === 'receive') {
-          console.log('领取赛跑奖励：', data)
-        } else {
-          data = JSON.parse(data);
-          let race = data.data.petRaceResult
-          if (race === 'participate') {
-            console.log('匹配成功！')
-          } else if (race === 'unbegin') {
-            console.log('还未开始！')
-          } else if (race === 'matching') {
-            console.log('正在匹配！')
-            await $.wait(2000)
-            await run()
-          } else if (race === 'unreceive') {
-            console.log('开始领奖')
-            await run('receive')
-          } else if (race === 'time_over') {
-            console.log('不在比赛时间')
-          } else {
-            console.log('这是什么！', data)
-          }
-        }
-      } catch (e) {
-        console.log(e)
-      } finally {
-        resolve();
-      }
-    })
-  })
-}
-
-function getFriends() {
-  return new Promise((resolve) => {
-    let lkt = new Date().getTime()
-    let lks = md5('' + 'q8DNJdpcfRQ69gIx' + lkt).toString()
-    $.post({
-      url: 'https://jdjoy.jd.com/common/pet/enterRoom/h5?invitePin=&reqSource=h5&invokeKey=q8DNJdpcfRQ69gIx',
-      headers: {
-        'lkt': lkt,
-        'lks': lks,
-        'Host': 'jdjoy.jd.com',
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'com.jingdong.app.mall',
-        'Referer': 'https://h5.m.jd.com/babelDiy/Zeus/2wuqXrZrhygTQzYA7VufBEpj4amH/index.html?babelChannel=ttt12&sid=445902658831621c5acf782ec27ce21w&un_area=12_904_3373_62101',
-        'Origin': 'https://h5.m.jd.com',
-        'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-        'Cookie': cookie
-      },
-      body: JSON.stringify({})
-    }, async (err, resp, data) => {
-      let flag = true
-      for (let k = 0; k < 20; k++) {
-        if (flag) {
-          await $.wait(1000)
-        } else {
-          console.log('无法获取好友列表')
-          break
-        }
-        $.get({
-          url: 'https://jdjoy.jd.com/common/pet/h5/getFriends?itemsPerPage=20&currentPage=1&reqSource=h5&invokeKey=q8DNJdpcfRQ69gIx',
-          headers: {
-            'Host': 'jdjoy.jd.com',
-            'Accept': '*/*',
-            'Referer': 'https://h5.m.jd.com/babelDiy/Zeus/2wuqXrZrhygTQzYA7VufBEpj4amH/index.html',
-            "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-            'cookie': cookie
-          }
-        }, async (err, resp, data) => {
-          data = JSON.parse(data)
-          if (data.datas) {
-            for (let f of data.datas) {
-              if (f.stealStatus === 'can_steal') {
-                console.log('可偷:', f.friendPin)
-                let lkt = new Date().getTime()
-                let lks = md5('' + 'q8DNJdpcfRQ69gIx' + lkt).toString()
-                $.get({
-                  url: `https://jdjoy.jd.com/common/pet/enterFriendRoom?reqSource=h5&invokeKey=q8DNJdpcfRQ69gIx&friendPin=${encodeURIComponent(f.friendPin)}`,
-                  headers: {
-                    'lkt': lkt,
-                    'lks': lks,
-                    'Host': 'jdjoy.jd.com',
-                    'Accept': '*/*',
-                    'Referer': 'https://h5.m.jd.com/babelDiy/Zeus/2wuqXrZrhygTQzYA7VufBEpj4amH/index.html',
-                    "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-                    'cookie': cookie
-                  }
-                }, (err, resp, data) => {
-                  let lkt = new Date().getTime()
-                  let lks = md5('' + 'q8DNJdpcfRQ69gIx' + lkt).toString()
-                  $.get({
-                    url: `https://jdjoy.jd.com/common/pet/getRandomFood?reqSource=h5&invokeKey=q8DNJdpcfRQ69gIx&friendPin=${encodeURIComponent(f.friendPin)}`,
-                    headers: {
-                      'lkt': lkt,
-                      'lks': lks,
-                      'Host': 'jdjoy.jd.com',
-                      'Accept': '*/*',
-                      'Referer': 'https://h5.m.jd.com/babelDiy/Zeus/2wuqXrZrhygTQzYA7VufBEpj4amH/index.html',
-                      "User-Agent": $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA') ? $.getdata('JDUA') : "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1"),
-                      'cookie': cookie
-                    }
-                  }, (err, resp, data) => {
-                    data = JSON.parse(data)
-                    console.log('偷狗粮:', data.errorCode, data.data)
-                  })
-                })
-              }
-              await $.wait(1500)
+    return __awaiter(this, void 0, void 0, function () {
+        var lkt, lks, data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    lkt = Date.now();
+                    lks = ts_md5_1.Md5.hashStr('' + invokeKey + lkt);
+                    return [4 /*yield*/, axios_1["default"].get("https://jdjoy.jd.com/common/pet/feed?feedCount=80&reqSource=h5&invokeKey=".concat(invokeKey), {
+                            headers: {
+                                'Host': 'jdjoy.jd.com',
+                                'lkt': lkt.toString(),
+                                'Origin': 'https://h5.m.jd.com',
+                                'User-Agent': TS_USER_AGENTS_1["default"],
+                                'lks': lks,
+                                'Referer': 'https://h5.m.jd.com/',
+                                'Content-Type': 'application/json',
+                                'Cookie': cookie
+                            }
+                        })];
+                case 1:
+                    data = (_a.sent()).data;
+                    return [2 /*return*/, data];
             }
-          }
-        })
-      }
-      resolve();
-    })
-  })
+        });
+    });
 }
-
-function requireConfig() {
-  return new Promise(resolve => {
-    notify = $.isNode() ? require('./sendNotify') : '';
-    //Node.js用户请在jdCookie.js处填写京东ck;
-    const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
-    //IOS等用户直接用NobyDa的jd cookie
-    if ($.isNode()) {
-      Object.keys(jdCookieNode).forEach((item) => {
-        if (jdCookieNode[item]) {
-          cookiesArr.push(jdCookieNode[item])
-        }
-      })
-      if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {
-      };
-    } else {
-      cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
-    }
-    console.log(`共${cookiesArr.length}个京东账号\n`)
-    resolve()
-  })
+function beforeTask(fn, linkAddr) {
+    return __awaiter(this, void 0, void 0, function () {
+        var lkt, lks, data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    lkt = Date.now();
+                    lks = ts_md5_1.Md5.hashStr('' + invokeKey + lkt);
+                    return [4 /*yield*/, axios_1["default"].get("https://jdjoy.jd.com/common/pet/icon/click1?iconCode=".concat(fn, "&linkAddr=").concat(linkAddr, "&reqSource=h5&invokeKey=").concat(invokeKey), {
+                            headers: {
+                                'Host': 'jdjoy.jd.com',
+                                'Accept': '*/*',
+                                'lkt': lkt.toString(),
+                                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                                'Origin': 'https://h5.m.jd.com',
+                                'User-Agent': TS_USER_AGENTS_1["default"],
+                                'Connection': 'keep-alive',
+                                'lks': lks,
+                                'Referer': 'https://h5.m.jd.com/',
+                                'Content-Type': 'application/json',
+                                'Cookie': cookie
+                            }
+                        })];
+                case 1:
+                    data = (_a.sent()).data;
+                    if (data.errorCode) {
+                        console.log(data.errorCode);
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
 }
-
-function jsonParse(str) {
-  if (typeof str == "string") {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      console.log(e);
-      $.msg($.name, '', '请勿随意在BoxJs输入框修改内容\n建议通过脚本去获取cookie')
-      return [];
-    }
-  }
+function doTask(fn, body) {
+    return __awaiter(this, void 0, void 0, function () {
+        var lkt, lks, data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    lkt = Date.now();
+                    lks = ts_md5_1.Md5.hashStr('' + invokeKey + lkt);
+                    return [4 /*yield*/, axios_1["default"].post("https://jdjoy.jd.com/common/pet/".concat(fn, "?reqSource=h5&invokeKey=").concat(invokeKey), typeof body === 'object' ? JSON.stringify(body) : body, {
+                            headers: {
+                                'Host': 'jdjoy.jd.com',
+                                'lkt': lkt.toString(),
+                                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                                'Origin': 'https://h5.m.jd.com',
+                                'User-Agent': TS_USER_AGENTS_1["default"],
+                                'Referer': 'https://h5.m.jd.com/',
+                                'lks': lks,
+                                'Content-Type': typeof body === 'object' ? 'application/json' : 'application/x-www-form-urlencoded',
+                                'Cookie': cookie
+                            }
+                        })];
+                case 1:
+                    data = (_a.sent()).data;
+                    console.log(data.errorCode);
+                    return [2 /*return*/];
+            }
+        });
+    });
 }
-
-function Env(t, e) {
-  "undefined" != typeof process && JSON.stringify(process.env).indexOf("GITHUB") > -1 && process.exit(0);
-
-  class s {
-    constructor(t) {
-      this.env = t
-    }
-
-    send(t, e = "GET") {
-      t = "string" == typeof t ? {url: t} : t;
-      let s = this.get;
-      return "POST" === e && (s = this.post), new Promise((e, i) => {
-        s.call(this, t, (t, s, r) => {
-          t ? i(t) : e(s)
-        })
-      })
-    }
-
-    get(t) {
-      return this.send.call(this.env, t)
-    }
-
-    post(t) {
-      return this.send.call(this.env, t, "POST")
-    }
-  }
-
-  return new class {
-    constructor(t, e) {
-      this.name = t, this.http = new s(this), this.data = null, this.dataFile = "box.dat", this.logs = [], this.isMute = !1, this.isNeedRewrite = !1, this.logSeparator = "\n", this.startTime = (new Date).getTime(), Object.assign(this, e), this.log("", `🔔${this.name}, 开始!`)
-    }
-
-    isNode() {
-      return "undefined" != typeof module && !!module.exports
-    }
-
-    isQuanX() {
-      return "undefined" != typeof $task
-    }
-
-    isSurge() {
-      return "undefined" != typeof $httpClient && "undefined" == typeof $loon
-    }
-
-    isLoon() {
-      return "undefined" != typeof $loon
-    }
-
-    toObj(t, e = null) {
-      try {
-        return JSON.parse(t)
-      } catch {
-        return e
-      }
-    }
-
-    toStr(t, e = null) {
-      try {
-        return JSON.stringify(t)
-      } catch {
-        return e
-      }
-    }
-
-    getjson(t, e) {
-      let s = e;
-      const i = this.getdata(t);
-      if (i) try {
-        s = JSON.parse(this.getdata(t))
-      } catch {
-      }
-      return s
-    }
-
-    setjson(t, e) {
-      try {
-        return this.setdata(JSON.stringify(t), e)
-      } catch {
-        return !1
-      }
-    }
-
-    getScript(t) {
-      return new Promise(e => {
-        this.get({url: t}, (t, s, i) => e(i))
-      })
-    }
-
-    runScript(t, e) {
-      return new Promise(s => {
-        let i = this.getdata("@chavy_boxjs_userCfgs.httpapi");
-        i = i ? i.replace(/\n/g, "").trim() : i;
-        let r = this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");
-        r = r ? 1 * r : 20, r = e && e.timeout ? e.timeout : r;
-        const [o, h] = i.split("@"), n = {
-          url: `http://${h}/v1/scripting/evaluate`,
-          body: {script_text: t, mock_type: "cron", timeout: r},
-          headers: {"X-Key": o, Accept: "*/*"}
-        };
-        this.post(n, (t, e, i) => s(i))
-      }).catch(t => this.logErr(t))
-    }
-
-    loaddata() {
-      if (!this.isNode()) return {};
-      {
-        this.fs = this.fs ? this.fs : require("fs"), this.path = this.path ? this.path : require("path");
-        const t = this.path.resolve(this.dataFile), e = this.path.resolve(process.cwd(), this.dataFile),
-          s = this.fs.existsSync(t), i = !s && this.fs.existsSync(e);
-        if (!s && !i) return {};
-        {
-          const i = s ? t : e;
-          try {
-            return JSON.parse(this.fs.readFileSync(i))
-          } catch (t) {
-            return {}
-          }
-        }
-      }
-    }
-
-    writedata() {
-      if (this.isNode()) {
-        this.fs = this.fs ? this.fs : require("fs"), this.path = this.path ? this.path : require("path");
-        const t = this.path.resolve(this.dataFile), e = this.path.resolve(process.cwd(), this.dataFile),
-          s = this.fs.existsSync(t), i = !s && this.fs.existsSync(e), r = JSON.stringify(this.data);
-        s ? this.fs.writeFileSync(t, r) : i ? this.fs.writeFileSync(e, r) : this.fs.writeFileSync(t, r)
-      }
-    }
-
-    lodash_get(t, e, s) {
-      const i = e.replace(/\[(\d+)\]/g, ".$1").split(".");
-      let r = t;
-      for (const t of i) if (r = Object(r)[t], void 0 === r) return s;
-      return r
-    }
-
-    lodash_set(t, e, s) {
-      return Object(t) !== t ? t : (Array.isArray(e) || (e = e.toString().match(/[^.[\]]+/g) || []), e.slice(0, -1).reduce((t, s, i) => Object(t[s]) === t[s] ? t[s] : t[s] = Math.abs(e[i + 1]) >> 0 == +e[i + 1] ? [] : {}, t)[e[e.length - 1]] = s, t)
-    }
-
-    getdata(t) {
-      let e = this.getval(t);
-      if (/^@/.test(t)) {
-        const [, s, i] = /^@(.*?)\.(.*?)$/.exec(t), r = s ? this.getval(s) : "";
-        if (r) try {
-          const t = JSON.parse(r);
-          e = t ? this.lodash_get(t, i, "") : e
-        } catch (t) {
-          e = ""
-        }
-      }
-      return e
-    }
-
-    setdata(t, e) {
-      let s = !1;
-      if (/^@/.test(e)) {
-        const [, i, r] = /^@(.*?)\.(.*?)$/.exec(e), o = this.getval(i), h = i ? "null" === o ? null : o || "{}" : "{}";
-        try {
-          const e = JSON.parse(h);
-          this.lodash_set(e, r, t), s = this.setval(JSON.stringify(e), i)
-        } catch (e) {
-          const o = {};
-          this.lodash_set(o, r, t), s = this.setval(JSON.stringify(o), i)
-        }
-      } else s = this.setval(t, e);
-      return s
-    }
-
-    getval(t) {
-      return this.isSurge() || this.isLoon() ? $persistentStore.read(t) : this.isQuanX() ? $prefs.valueForKey(t) : this.isNode() ? (this.data = this.loaddata(), this.data[t]) : this.data && this.data[t] || null
-    }
-
-    setval(t, e) {
-      return this.isSurge() || this.isLoon() ? $persistentStore.write(t, e) : this.isQuanX() ? $prefs.setValueForKey(t, e) : this.isNode() ? (this.data = this.loaddata(), this.data[e] = t, this.writedata(), !0) : this.data && this.data[e] || null
-    }
-
-    initGotEnv(t) {
-      this.got = this.got ? this.got : require("got"), this.cktough = this.cktough ? this.cktough : require("tough-cookie"), this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar, t && (t.headers = t.headers ? t.headers : {}, void 0 === t.headers.Cookie && void 0 === t.cookieJar && (t.cookieJar = this.ckjar))
-    }
-
-    get(t, e = (() => {
-    })) {
-      t.headers && (delete t.headers["Content-Type"], delete t.headers["Content-Length"]), this.isSurge() || this.isLoon() ? (this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {"X-Surge-Skip-Scripting": !1})), $httpClient.get(t, (t, s, i) => {
-        !t && s && (s.body = i, s.statusCode = s.status), e(t, s, i)
-      })) : this.isQuanX() ? (this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {hints: !1})), $task.fetch(t).then(t => {
-        const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-        e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-      }, t => e(t))) : this.isNode() && (this.initGotEnv(t), this.got(t).on("redirect", (t, e) => {
-        try {
-          if (t.headers["set-cookie"]) {
-            const s = t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();
-            s && this.ckjar.setCookieSync(s, null), e.cookieJar = this.ckjar
-          }
-        } catch (t) {
-          this.logErr(t)
-        }
-      }).then(t => {
-        const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-        e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-      }, t => {
-        const {message: s, response: i} = t;
-        e(s, i, i && i.body)
-      }))
-    }
-
-    post(t, e = (() => {
-    })) {
-      if (t.body && t.headers && !t.headers["Content-Type"] && (t.headers["Content-Type"] = "application/x-www-form-urlencoded"), t.headers && delete t.headers["Content-Length"], this.isSurge() || this.isLoon()) this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {"X-Surge-Skip-Scripting": !1})), $httpClient.post(t, (t, s, i) => {
-        !t && s && (s.body = i, s.statusCode = s.status), e(t, s, i)
-      }); else if (this.isQuanX()) t.method = "POST", this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {hints: !1})), $task.fetch(t).then(t => {
-        const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-        e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-      }, t => e(t)); else if (this.isNode()) {
-        this.initGotEnv(t);
-        const {url: s, ...i} = t;
-        this.got.post(s, i).then(t => {
-          const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-          e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-        }, t => {
-          const {message: s, response: i} = t;
-          e(s, i, i && i.body)
-        })
-      }
-    }
-
-    time(t, e = null) {
-      const s = e ? new Date(e) : new Date;
-      let i = {
-        "M+": s.getMonth() + 1,
-        "d+": s.getDate(),
-        "H+": s.getHours(),
-        "m+": s.getMinutes(),
-        "s+": s.getSeconds(),
-        "q+": Math.floor((s.getMonth() + 3) / 3),
-        S: s.getMilliseconds()
-      };
-      /(y+)/.test(t) && (t = t.replace(RegExp.$1, (s.getFullYear() + "").substr(4 - RegExp.$1.length)));
-      for (let e in i) new RegExp("(" + e + ")").test(t) && (t = t.replace(RegExp.$1, 1 == RegExp.$1.length ? i[e] : ("00" + i[e]).substr(("" + i[e]).length)));
-      return t
-    }
-
-    msg(e = t, s = "", i = "", r) {
-      const o = t => {
-        if (!t) return t;
-        if ("string" == typeof t) return this.isLoon() ? t : this.isQuanX() ? {"open-url": t} : this.isSurge() ? {url: t} : void 0;
-        if ("object" == typeof t) {
-          if (this.isLoon()) {
-            let e = t.openUrl || t.url || t["open-url"], s = t.mediaUrl || t["media-url"];
-            return {openUrl: e, mediaUrl: s}
-          }
-          if (this.isQuanX()) {
-            let e = t["open-url"] || t.url || t.openUrl, s = t["media-url"] || t.mediaUrl;
-            return {"open-url": e, "media-url": s}
-          }
-          if (this.isSurge()) {
-            let e = t.url || t.openUrl || t["open-url"];
-            return {url: e}
-          }
-        }
-      };
-      if (this.isMute || (this.isSurge() || this.isLoon() ? $notification.post(e, s, i, o(r)) : this.isQuanX() && $notify(e, s, i, o(r))), !this.isMuteLog) {
-        let t = ["", "==============📣系统通知📣=============="];
-        t.push(e), s && t.push(s), i && t.push(i), console.log(t.join("\n")), this.logs = this.logs.concat(t)
-      }
-    }
-
-    log(...t) {
-      t.length > 0 && (this.logs = [...this.logs, ...t]), console.log(t.join(this.logSeparator))
-    }
-
-    logErr(t, e) {
-      const s = !this.isSurge() && !this.isQuanX() && !this.isLoon();
-      s ? this.log("", `❗️${this.name}, 错误!`, t.stack) : this.log("", `❗️${this.name}, 错误!`, t)
-    }
-
-    wait(t) {
-      return new Promise(e => setTimeout(e, t))
-    }
-
-    done(t = {}) {
-      const e = (new Date).getTime(), s = (e - this.startTime) / 1e3;
-      this.log("", `🔔${this.name}, 结束! 🕛 ${s} 秒`), this.log(), (this.isSurge() || this.isQuanX() || this.isLoon()) && $done(t)
-    }
-  }(t, e)
+function click(iconCode, linkAddr) {
+    return __awaiter(this, void 0, void 0, function () {
+        var lkt, lks, url, data;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    lkt = Date.now();
+                    lks = ts_md5_1.Md5.hashStr('' + invokeKey + lkt);
+                    url = linkAddr
+                        ? "https://jdjoy.jd.com/common/pet/icon/click?code=1624363341529274068136&iconCode=".concat(iconCode, "&linkAddr=").concat(linkAddr, "&reqSource=h5&invokeKey=").concat(invokeKey)
+                        : "https://jdjoy.jd.com/common/pet/icon/click?code=1624363341529274068136&iconCode=".concat(iconCode, "&reqSource=h5&invokeKey=").concat(invokeKey);
+                    return [4 /*yield*/, axios_1["default"].get(url, {
+                            headers: {
+                                'Host': 'jdjoy.jd.com',
+                                'Connection': 'keep-alive',
+                                'Sec-Fetch-Mode': 'cors',
+                                'Origin': 'https://h5.m.jd.com',
+                                'lks': lks,
+                                'User-Agent': TS_USER_AGENTS_1["default"],
+                                'lkt': lkt.toString(),
+                                'content-type': 'application/json',
+                                'X-Requested-With': 'com.jingdong.app.mall',
+                                'Referer': 'https://h5.m.jd.com/babelDiy/Zeus/2wuqXrZrhygTQzYA7VufBEpj4amH/index.html',
+                                'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+                                'Cookie': cookie
+                            }
+                        })];
+                case 1:
+                    data = (_a.sent()).data;
+                    if (data.errorCode) {
+                        console.log(data.errorCode);
+                    }
+                    return [2 /*return*/];
+            }
+        });
+    });
 }
