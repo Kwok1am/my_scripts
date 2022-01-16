@@ -37,12 +37,12 @@ jobs:
         #rename 's/\.js/cdle.js/' ./cdle/scripts/*
         #cp -f ./cdle/scripts/*_*.js ./
         #rm -rf ./cdle
-        echo "========= 开始下载star261的脚本 ========="
-        git clone -b main https://github.com/star261/jd.git  ./star261
-        rm -r ./star261/scripts/jd_ddworld.js
+        #echo "========= 开始下载star261的脚本 ========="
+        #git clone -b main https://github.com/star261/jd.git  ./star261
+        #rm -r ./star261/scripts/jd_ddworld.js
         #mv ./star261/scripts/jd_jxmc.js ./jd_jxmc.js
-        cp -f ./star261/scripts/jd_*.js ./
-        rm -rf ./star261
+        #cp -f ./star261/scripts/jd_*.js ./
+        #rm -rf ./star261
         #echo "========= 开始下载Wenmoux的脚本 ========="
         #git clone -b wen https://github.com/Wenmoux/scripts.git ./Wenmoux
         #mv ./Wenmoux/jd/chinnkarahoi_jd_bookshop.js ./jd_bookshopWenmoux.js
