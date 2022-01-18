@@ -64,7 +64,7 @@ let USER_AGENT = USER_AGENTS[getRandomNumberByRange(0, USER_AGENTS.length)]
 
 async function getBeanShareCode(cookie: string) {
   let {data}: any = await axios.post('https://api.m.jd.com/client.action',
-    `functionId=plantBeanIndex&body=${escape(
+    `functionId=plantBeanIndex&body=${encodeURIComponent(
       JSON.stringify({version: "9.0.0.1", "monitor_source": "plant_app_plant_index", "monitor_refer": ""})
     )}&appid=ld&client=apple&area=5_274_49707_49973&build=167283&clientVersion=9.1.0`, {
       headers: {
@@ -82,7 +82,7 @@ async function getBeanShareCode(cookie: string) {
 }
 
 async function getFarmShareCode(cookie: string) {
-  let {data}: any = await axios.post('https://api.m.jd.com/client.action?functionId=initForFarm', `body=${escape(JSON.stringify({"version": 4}))}&appid=wh5&clientVersion=9.1.0`, {
+  let {data}: any = await axios.post('https://api.m.jd.com/client.action?functionId=initForFarm', `body=${encodeURIComponent(JSON.stringify({"version": 4}))}&appid=wh5&clientVersion=9.1.0`, {
     headers: {
       "cookie": cookie,
       "origin": "https://home.m.jd.com",
@@ -148,7 +148,6 @@ async function requestAlgo(appId: number = 10032) {
     })
     if (data['status'] === 200) {
       token = data.data.result.tk
-      console.log('token:', token)
       let enCryptMethodJDString = data.data.result.algo
       if (enCryptMethodJDString) enCryptMethodJD = new Function(`return ${enCryptMethodJDString}`)()
     } else {
@@ -171,7 +170,7 @@ function generateFp() {
 function getQueryString(url: string, name: string) {
   let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i")
   let r = url.split('?')[1].match(reg)
-  if (r != null) return unescape(r[2])
+  if (r != null) return decodeURIComponent(r[2])
   return ''
 }
 
@@ -264,7 +263,7 @@ function randomNumString(e: number) {
 }
 
 function randomWord() {
-  let t = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', a = t.length, n = ""
+  let t = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', a = t.length
   return t.charAt(Math.floor(Math.random() * a))
 }
 
@@ -303,6 +302,58 @@ async function getShareCodePool(key: string, num: number) {
   return shareCode
 }
 
+async function wechat_app_msg(title: string, content: string, user: string) {
+  let corpid: string = "", corpsecret: string = ""
+  let {data: gettoken} = await axios.get(`https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=${corpid}&corpsecret=${corpsecret}`)
+  let access_token: string = gettoken.access_token
+
+  let {data: send} = await axios.post(`https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=${access_token}`, {
+    "touser": user,
+    "msgtype": "text",
+    "agentid": 1000002,
+    "text": {
+      "content": `${title}\n\n${content}`
+    },
+    "safe": 0
+  })
+  if (send.errcode === 0) {
+    console.log('企业微信应用消息发送成功')
+  } else {
+    console.log('企业微信应用消息发送失败', send)
+  }
+}
+
+function obj2str(obj: object) {
+  return JSON.stringify(obj)
+}
+
+async function getDevice() {
+  let {data} = await axios.get('https://betahub.cn/api/apple/devices/iPhone', {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36'
+    }
+  })
+  data = data[getRandomNumberByRange(0, 16)]
+  return data.identifier
+}
+
+async function getVersion(device: string) {
+  let {data} = await axios.get(`https://betahub.cn/api/apple/firmwares/${device}`, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36'
+    }
+  })
+  data = data[getRandomNumberByRange(0, data.length)]
+  return data.firmware_info.version
+}
+
+async function jdpingou() {
+  let device: string, version: string;
+  device = await getDevice();
+  version = await getVersion(device);
+  return `jdpingou;iPhone;5.19.0;${version};${randomString(40)};network/wifi;model/${device};appBuild/100833;ADID/;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/${getRandomNumberByRange(10, 90)};pap/JA2019_3111789;brand/apple;supportJDSHWK/1;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148`
+}
+
 export default USER_AGENT
 export {
   TotalBean,
@@ -322,5 +373,8 @@ export {
   randomNumString,
   getshareCodeHW,
   getShareCodePool,
-  randomWord
+  randomWord,
+  wechat_app_msg,
+  obj2str,
+  jdpingou
 }
