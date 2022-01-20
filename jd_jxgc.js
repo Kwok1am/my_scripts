@@ -72,13 +72,14 @@ var path = require("path");
 var date_fns_1 = require("date-fns");
 var sendNotify_1 = require("./sendNotify");
 var TS_USER_AGENTS_1 = require("./TS_USER_AGENTS");
+var V3_1 = require("./utils/V3");
 var cookie = '', res = '', UserName;
 !(function () { return __awaiter(void 0, void 0, void 0, function () {
     var cookiesArr, except, _a, _b, _c, index, value, productionId, factoryId, investedElectric, needElectric, progress, flag, j, _d, _e, t, e_1_1, j, e_2_1;
     var e_2, _f, e_1, _g;
     return __generator(this, function (_h) {
         switch (_h.label) {
-            case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requestAlgo)(10001)];
+            case 0: return [4 /*yield*/, (0, V3_1.requestAlgo)('c0ff1')];
             case 1:
                 _h.sent();
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
@@ -200,7 +201,7 @@ var cookie = '', res = '', UserName;
             case 23:
                 if (!!_e.done) return [3 /*break*/, 27];
                 t = _e.value;
-                if (!(t.date !== (0, date_fns_1.format)(Date.now(), "yyyyMMdd"))) return [3 /*break*/, 26];
+                if (!(t.date !== (0, date_fns_1.format)(Date.now(), "yyyyMMdd") && new Date().getHours() >= 6)) return [3 /*break*/, 26];
                 return [4 /*yield*/, api('friend/HireAward', '_time,date,type,zone', { date: t.date })];
             case 24:
                 res = _h.sent();
@@ -302,7 +303,7 @@ function task() {
                 case 8:
                     if (!(t.dateType === 2 && t.completedTimes < t.targetTimes && [2, 6, 9].indexOf(t.taskType) > -1)) return [3 /*break*/, 13];
                     console.log('任务开始：', t.taskName);
-                    return [4 /*yield*/, api('DoTask', '_time,bizCode,configExtra,source,taskId', { configExtra: '', taskId: t.taskId, bizCode: t.bizCode })];
+                    return [4 /*yield*/, api('DoTask', '_time,_ts,bizCode,configExtra,source,taskId', { taskId: t.taskId, bizCode: t.bizCode, configExtra: '' })];
                 case 9:
                     res = _d.sent();
                     return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(5000)];
@@ -339,32 +340,51 @@ function task() {
 function api(fn, stk, params) {
     if (params === void 0) { params = {}; }
     return __awaiter(this, void 0, void 0, function () {
-        var url, t, data;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var url, timestamp, t, w, _a, _b, _c, key, value, h5st, data;
+        var e_4, _d;
+        return __generator(this, function (_e) {
+            switch (_e.label) {
                 case 0:
-                    t = Date.now();
-                    if (['GetUserTaskStatusList', 'DoTask', 'Award'].includes(fn)) {
-                        url = "https://m.jingxi.com/newtasksys/newtasksys_front/".concat(fn, "?source=dreamfactory&_time=").concat(t, "&_stk=").concat(encodeURIComponent(stk), "&_ste=1&_=").concat(t + 3, "&sceneval=2&g_login_type=1&callback=jsonpCBK").concat((0, TS_USER_AGENTS_1.randomWord)(), "&g_ty=ls");
+                    timestamp = Date.now();
+                    t = [
+                        { key: '_time', value: timestamp.toString() },
+                        { key: '_ts', value: timestamp.toString() },
+                        { key: 'bizCode', value: 'dream_factory' },
+                        { key: 'source', value: 'dreamfactory' },
+                    ];
+                    w = (0, TS_USER_AGENTS_1.randomWord)();
+                    if (['GetUserTaskStatusList', 'DoTask', 'Award'].includes(fn))
+                        url = "https://m.jingxi.com/newtasksys/newtasksys_front/".concat(fn, "?source=dreamfactory&_time=").concat(timestamp, "&_ts=").concat(timestamp, "&_stk=").concat(encodeURIComponent(stk), "&_=").concat(timestamp + 3, "&sceneval=2&g_login_type=1&callback=jsonpCBK").concat(w).concat(w, "&g_ty=ls");
+                    else
+                        url = "https://m.jingxi.com/dreamfactory/".concat(fn, "?zone=dream_factory&_time=").concat(timestamp, "&_stk=").concat(encodeURIComponent(stk), "&_ste=1&_=").concat(timestamp + 3, "&sceneval=2&g_login_type=1&callback=jsonpCBK").concat(w).concat(w, "&g_ty=ls");
+                    try {
+                        for (_a = __values(Object.entries(params)), _b = _a.next(); !_b.done; _b = _a.next()) {
+                            _c = __read(_b.value, 2), key = _c[0], value = _c[1];
+                            t.push({ key: key, value: value });
+                            url += "&".concat(key, "=").concat(value);
+                        }
                     }
-                    else {
-                        url = "https://m.jingxi.com/dreamfactory/".concat(fn, "?zone=dream_factory&_time=").concat(t, "&_stk=").concat(encodeURIComponent(stk), "&_ste=1&_=").concat(t + 3, "&sceneval=2&g_login_type=1&callback=jsonpCBK").concat((0, TS_USER_AGENTS_1.randomWord)(), "&g_ty=ls");
+                    catch (e_4_1) { e_4 = { error: e_4_1 }; }
+                    finally {
+                        try {
+                            if (_b && !_b.done && (_d = _a["return"])) _d.call(_a);
+                        }
+                        finally { if (e_4) throw e_4.error; }
                     }
-                    url = (0, TS_USER_AGENTS_1.h5st)(url, stk, params, 10001);
+                    h5st = (0, V3_1.geth5st)(t, 'c0ff1');
+                    url += "&h5st=".concat(encodeURIComponent(h5st));
                     return [4 /*yield*/, axios_1["default"].get(url, {
                             headers: {
                                 'Host': 'm.jingxi.com',
-                                'Accept': '*/*',
-                                'Connection': 'keep-alive',
-                                'User-Agent': "jdpingou;",
+                                'User-Agent': 'jdpingou;',
                                 'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
                                 'Referer': 'https://st.jingxi.com/',
                                 'Cookie': cookie
                             }
                         })];
                 case 1:
-                    data = (_a.sent()).data;
-                    return [2 /*return*/, JSON.parse(data.match(/try.?{jsonpCBK.?\((.*)/)[1])];
+                    data = (_e.sent()).data;
+                    return [2 /*return*/, JSON.parse(data.match(/try.?{jsonpCBK.?.?\((.*)/)[1])];
             }
         });
     });
