@@ -58,7 +58,7 @@ jobs:
         cp -f ./JDHelloWorld/sendNotify.js ./sendNotify.js
         mv ./JDHelloWorld/utils/*.json ./utils/
         mv ./JDHelloWorld/utils/*.js ./utils/
-        mv ./JDHelloWorld/utils/*.ts ./utils/
+        cp -f ./JDHelloWorld/utils/*.ts ./utils/
         cd ./JDHelloWorld
         echo "========= 开始安装依赖 ========="
         sudo npm install
