@@ -39,6 +39,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 exports.__esModule = true;
 var axios_1 = require("axios");
 var fs_1 = require("fs");
@@ -114,9 +125,10 @@ function set(task, bearer, cron) {
 }
 function get(name, bearer) {
     return __awaiter(this, void 0, void 0, function () {
-        var data, _i, _a, task;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var data, _a, _b, task;
+        var e_1, _c;
+        return __generator(this, function (_d) {
+            switch (_d.label) {
                 case 0: return [4 /*yield*/, axios_1["default"].get("http://".concat(server, "/api/crons?searchValue=&t=").concat(Date.now()), {
                         headers: {
                             'Authorization': "Bearer ".concat(bearer),
@@ -125,12 +137,21 @@ function get(name, bearer) {
                         }
                     })];
                 case 1:
-                    data = (_b.sent()).data;
-                    for (_i = 0, _a = data.data; _i < _a.length; _i++) {
-                        task = _a[_i];
-                        if (task.name === name) {
-                            return [2 /*return*/, task];
+                    data = (_d.sent()).data;
+                    try {
+                        for (_a = __values(data.data), _b = _a.next(); !_b.done; _b = _a.next()) {
+                            task = _b.value;
+                            if (task.name === name) {
+                                return [2 /*return*/, task];
+                            }
                         }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (_b && !_b.done && (_c = _a["return"])) _c.call(_a);
+                        }
+                        finally { if (e_1) throw e_1.error; }
                     }
                     return [2 /*return*/];
             }

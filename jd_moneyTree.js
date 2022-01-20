@@ -35,22 +35,34 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 exports.__esModule = true;
 var axios_1 = require("axios");
 var TS_USER_AGENTS_1 = require("./TS_USER_AGENTS");
 var cookie = '', res = '', UserName, index;
 !(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var cookiesArr, i, body, user, _i, _a, sign, k, _b, _c, t, readTime;
-    var _d, _e, _f, _g, _h, _j;
-    return __generator(this, function (_k) {
-        switch (_k.label) {
+    var cookiesArr, i, body, user, _a, _b, sign, e_1_1, k, _c, _d, t, readTime, e_2_1;
+    var e_1, _e, e_2, _f;
+    var _g, _h, _j, _k, _l, _m;
+    return __generator(this, function (_o) {
+        switch (_o.label) {
             case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
             case 1:
-                cookiesArr = _k.sent();
+                cookiesArr = _o.sent();
                 i = 0;
-                _k.label = 2;
+                _o.label = 2;
             case 2:
-                if (!(i < cookiesArr.length)) return [3 /*break*/, 37];
+                if (!(i < cookiesArr.length)) return [3 /*break*/, 45];
                 cookie = cookiesArr[i];
                 UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)[1]);
                 index = i + 1;
@@ -72,12 +84,12 @@ var cookie = '', res = '', UserName, index;
                 body.riskDeviceParam = JSON.stringify(body.riskDeviceParam);
                 return [4 /*yield*/, api('login', body)];
             case 3:
-                res = _k.sent();
+                res = _o.sent();
                 console.log(JSON.stringify(res));
                 user = res.resultData.data;
                 if (!user.realName) {
                     console.log("".concat(UserName, "\u672A\u5F00\u901A\u6E38\u620F"));
-                    return [3 /*break*/, 36];
+                    return [3 /*break*/, 44];
                 }
                 console.log('助力码:', user.sharePin);
                 // 收果子
@@ -93,10 +105,10 @@ var cookie = '', res = '', UserName, index;
                 };
                 return [4 /*yield*/, api('harvest', body)];
             case 4:
-                res = _k.sent();
+                res = _o.sent();
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
             case 5:
-                _k.sent();
+                _o.sent();
                 if (res.resultData.code === '200') {
                     console.log('收果子成功，剩余：', res.resultData.data.treeInfo.fruit);
                     console.log("\u8DDD\u79BB".concat(res.resultData.data.treeInfo.treeName, "\u8FD8\u6709").concat(res.resultData.data.treeInfo.progressLeft));
@@ -108,37 +120,51 @@ var cookie = '', res = '', UserName, index;
                 };
                 return [4 /*yield*/, api('signIndex', body)];
             case 6:
-                res = _k.sent();
+                res = _o.sent();
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
             case 7:
-                _k.sent();
-                if (!(((_d = res.resultData.data) === null || _d === void 0 ? void 0 : _d.canSign) === 2)) return [3 /*break*/, 12];
+                _o.sent();
+                if (!(((_g = res.resultData.data) === null || _g === void 0 ? void 0 : _g.canSign) === 2)) return [3 /*break*/, 16];
                 console.log('今日未签到');
-                _i = 0, _a = res.resultData.data.result;
-                _k.label = 8;
+                _o.label = 8;
             case 8:
-                if (!(_i < _a.length)) return [3 /*break*/, 11];
-                sign = _a[_i];
-                if (!(sign.signStatus === 0)) return [3 /*break*/, 10];
+                _o.trys.push([8, 13, 14, 15]);
+                _a = (e_1 = void 0, __values(res.resultData.data.result)), _b = _a.next();
+                _o.label = 9;
+            case 9:
+                if (!!_b.done) return [3 /*break*/, 12];
+                sign = _b.value;
+                if (!(sign.signStatus === 0)) return [3 /*break*/, 11];
                 console.log(sign);
                 body = { "source": 2, "signDay": sign.signDays, "riskDeviceParam": "{\"eid\":\"\",\"fp\":\"\",\"sdkToken\":\"\",\"token\":\"\",\"jstub\":\"\",\"appType\":4}" };
                 return [4 /*yield*/, api('signOne', body)];
-            case 9:
-                res = _k.sent();
-                console.log('签到:', res);
-                return [3 /*break*/, 11];
             case 10:
-                _i++;
-                return [3 /*break*/, 8];
-            case 11: return [3 /*break*/, 13];
-            case 12:
+                res = _o.sent();
+                console.log('签到:', res);
+                return [3 /*break*/, 12];
+            case 11:
+                _b = _a.next();
+                return [3 /*break*/, 9];
+            case 12: return [3 /*break*/, 15];
+            case 13:
+                e_1_1 = _o.sent();
+                e_1 = { error: e_1_1 };
+                return [3 /*break*/, 15];
+            case 14:
+                try {
+                    if (_b && !_b.done && (_e = _a["return"])) _e.call(_a);
+                }
+                finally { if (e_1) throw e_1.error; }
+                return [7 /*endfinally*/];
+            case 15: return [3 /*break*/, 17];
+            case 16:
                 console.log('今日已签到');
-                _k.label = 13;
-            case 13: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)
+                _o.label = 17;
+            case 17: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)
                 // 获取任务
             ];
-            case 14:
-                _k.sent();
+            case 18:
+                _o.sent();
                 // 获取任务
                 body = {
                     "source": 0,
@@ -154,31 +180,34 @@ var cookie = '', res = '', UserName, index;
                     }
                 };
                 k = 0;
-                _k.label = 15;
-            case 15:
-                if (!(k < 3)) return [3 /*break*/, 36];
+                _o.label = 19;
+            case 19:
+                if (!(k < 3)) return [3 /*break*/, 44];
                 console.log('Round:', k + 1);
                 body.riskDeviceParam = JSON.stringify(body.riskDeviceParam);
                 return [4 /*yield*/, api('dayWork', body)
                     // console.log('dayWork⬇️')
                     // console.log(JSON.stringify(res))
                 ];
-            case 16:
-                res = _k.sent();
+            case 20:
+                res = _o.sent();
                 // console.log('dayWork⬇️')
                 // console.log(JSON.stringify(res))
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
-            case 17:
+            case 21:
                 // console.log('dayWork⬇️')
                 // console.log(JSON.stringify(res))
-                _k.sent();
-                _b = 0, _c = res.resultData.data;
-                _k.label = 18;
-            case 18:
-                if (!(_b < _c.length)) return [3 /*break*/, 33];
-                t = _c[_b];
-                if (!(t.workStatus !== 2)) return [3 /*break*/, 32];
-                if (!(t.workType === 1)) return [3 /*break*/, 21];
+                _o.sent();
+                _o.label = 22;
+            case 22:
+                _o.trys.push([22, 39, 40, 41]);
+                _c = (e_2 = void 0, __values(res.resultData.data)), _d = _c.next();
+                _o.label = 23;
+            case 23:
+                if (!!_d.done) return [3 /*break*/, 38];
+                t = _d.value;
+                if (!(t.workStatus !== 2)) return [3 /*break*/, 37];
+                if (!(t.workType === 1)) return [3 /*break*/, 26];
                 // 时段签到
                 body = {
                     "source": 2,
@@ -188,46 +217,46 @@ var cookie = '', res = '', UserName, index;
                     "riskDeviceParam": "{\"eid\":\"\",\"fp\":\"\",\"sdkToken\":\"\",\"token\":\"\",\"jstub\":\"\",\"appType\":4}"
                 };
                 return [4 /*yield*/, api('doWork', body)];
-            case 19:
-                _k.sent();
+            case 24:
+                _o.sent();
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
-            case 20:
-                _k.sent();
+            case 25:
+                _o.sent();
                 console.log('时段签到:', res);
-                _k.label = 21;
-            case 21:
-                if (!(((_e = t.url) === null || _e === void 0 ? void 0 : _e.indexOf('readTime')) > -1)) return [3 /*break*/, 29];
+                _o.label = 26;
+            case 26:
+                if (!(((_h = t.url) === null || _h === void 0 ? void 0 : _h.indexOf('readTime')) > -1)) return [3 /*break*/, 34];
                 console.log(t.workName);
-                if (!(t.workStatus === -1)) return [3 /*break*/, 24];
+                if (!(t.workStatus === -1)) return [3 /*break*/, 29];
                 body = { "source": 2, "workType": t.workType, "opType": 4, "mid": t.mid, "riskDeviceParam": "{\"eid\":\"\",\"fp\":\"\",\"sdkToken\":\"\",\"token\":\"\",\"jstub\":\"\",\"appType\":4}" };
                 return [4 /*yield*/, api('doWork', body)];
-            case 22:
-                res = _k.sent();
-                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
-            case 23:
-                _k.sent();
-                console.log('领取任务:', (_g = (_f = res.resultData) === null || _f === void 0 ? void 0 : _f.data) === null || _g === void 0 ? void 0 : _g.opMsg);
-                _k.label = 24;
-            case 24:
-                if (!(t.workStatus === 0)) return [3 /*break*/, 29];
-                return [4 /*yield*/, mission('queryMissionReceiveAfterStatus', "%7B%22missionId%22:%22".concat(t.mid, "%22%7D"), t.url)];
-            case 25:
-                res = _k.sent();
-                console.log('任务开始:', (_h = res.resultData) === null || _h === void 0 ? void 0 : _h.msg);
-                readTime = t.url.split('readTime=')[1];
-                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(readTime * 1000)];
-            case 26:
-                _k.sent();
-                return [4 /*yield*/, mission('finishReadMission', "%7B%22missionId%22%3A%22".concat(t.mid, "%22%2C%22readTime%22%3A").concat(readTime, "%7D"), t.url)];
             case 27:
-                res = _k.sent();
-                console.log('任务完成:', (_j = res.resultData) === null || _j === void 0 ? void 0 : _j.msg);
+                res = _o.sent();
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
             case 28:
-                _k.sent();
-                _k.label = 29;
+                _o.sent();
+                console.log('领取任务:', (_k = (_j = res.resultData) === null || _j === void 0 ? void 0 : _j.data) === null || _k === void 0 ? void 0 : _k.opMsg);
+                _o.label = 29;
             case 29:
-                if (!(t.workStatus === 1)) return [3 /*break*/, 32];
+                if (!(t.workStatus === 0)) return [3 /*break*/, 34];
+                return [4 /*yield*/, mission('queryMissionReceiveAfterStatus', "%7B%22missionId%22:%22".concat(t.mid, "%22%7D"), t.url)];
+            case 30:
+                res = _o.sent();
+                console.log('任务开始:', (_l = res.resultData) === null || _l === void 0 ? void 0 : _l.msg);
+                readTime = t.url.split('readTime=')[1];
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(readTime * 1000)];
+            case 31:
+                _o.sent();
+                return [4 /*yield*/, mission('finishReadMission', "%7B%22missionId%22%3A%22".concat(t.mid, "%22%2C%22readTime%22%3A").concat(readTime, "%7D"), t.url)];
+            case 32:
+                res = _o.sent();
+                console.log('任务完成:', (_m = res.resultData) === null || _m === void 0 ? void 0 : _m.msg);
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
+            case 33:
+                _o.sent();
+                _o.label = 34;
+            case 34:
+                if (!(t.workStatus === 1)) return [3 /*break*/, 37];
                 body = {
                     "source": 0,
                     "workType": t.workType,
@@ -236,27 +265,38 @@ var cookie = '', res = '', UserName, index;
                     "riskDeviceParam": "{\"eid\":\"\",\"fp\":\"\",\"sdkToken\":\"\",\"token\":\"\",\"jstub\":\"\",\"appType\":2}"
                 };
                 return [4 /*yield*/, api('doWork', body)];
-            case 30:
-                res = _k.sent();
+            case 35:
+                res = _o.sent();
                 console.log(t.workName, res.resultData.data.opMsg, res.resultData.data.prizeAmount);
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
-            case 31:
-                _k.sent();
-                _k.label = 32;
-            case 32:
-                _b++;
-                return [3 /*break*/, 18];
-            case 33: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
-            case 34:
-                _k.sent();
-                _k.label = 35;
-            case 35:
-                k++;
-                return [3 /*break*/, 15];
             case 36:
+                _o.sent();
+                _o.label = 37;
+            case 37:
+                _d = _c.next();
+                return [3 /*break*/, 23];
+            case 38: return [3 /*break*/, 41];
+            case 39:
+                e_2_1 = _o.sent();
+                e_2 = { error: e_2_1 };
+                return [3 /*break*/, 41];
+            case 40:
+                try {
+                    if (_d && !_d.done && (_f = _c["return"])) _f.call(_c);
+                }
+                finally { if (e_2) throw e_2.error; }
+                return [7 /*endfinally*/];
+            case 41: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
+            case 42:
+                _o.sent();
+                _o.label = 43;
+            case 43:
+                k++;
+                return [3 /*break*/, 19];
+            case 44:
                 i++;
                 return [3 /*break*/, 2];
-            case 37: return [2 /*return*/];
+            case 45: return [2 /*return*/];
         }
     });
 }); })();
