@@ -63,7 +63,7 @@ jobs:
         echo "========= 开始安装依赖 ========="
         sudo npm install
         echo "========= 开始转换JDHelloWorld的ts ========="
-        tsc ./*.ts
+        tsc ./*.ts --downlevelIteration
         cd ..
         cp -f ./JDHelloWorld/*_*.js ./
         cp -f ./JDHelloWorld/*_*.ts ./activity
