@@ -182,7 +182,7 @@ var cookie = '', UserName = '', res = '', shareCodes = [], shareCodesSelf = [], 
                 finally { if (e_2) throw e_2.error; }
                 return [7 /*endfinally*/];
             case 22:
-                if (!(new Date().getHours() === 23)) return [3 /*break*/, 28];
+                if (!(new Date().getHours() === 22)) return [3 /*break*/, 28];
                 return [4 /*yield*/, api('superBrandSecondFloorMainPage', { "source": "secondfloor" })];
             case 23:
                 res = _7.sent();
@@ -220,27 +220,22 @@ var cookie = '', UserName = '', res = '', shareCodes = [], shareCodesSelf = [], 
                 }
                 finally { if (e_3) throw e_3.error; }
                 return [7 /*endfinally*/];
-            case 32:
-                console.log('开始助力...');
-                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(10000)];
+            case 32: return [4 /*yield*/, (0, TS_USER_AGENTS_1.getshareCodeHW)('tewu')];
             case 33:
-                _7.sent();
-                return [4 /*yield*/, (0, TS_USER_AGENTS_1.getshareCodeHW)('tewu')];
-            case 34:
                 shareCodesHW = _7.sent();
                 shareCodes = __spreadArray(__spreadArray([], __read(shareCodesSelf), false), __read(shareCodesHW), false);
                 full = [];
+                _7.label = 34;
+            case 34:
+                _7.trys.push([34, 46, 47, 48]);
+                _f = __values(cookiesArr.entries()), _g = _f.next();
                 _7.label = 35;
             case 35:
-                _7.trys.push([35, 47, 48, 49]);
-                _f = __values(cookiesArr.entries()), _g = _f.next();
-                _7.label = 36;
-            case 36:
-                if (!!_g.done) return [3 /*break*/, 46];
+                if (!!_g.done) return [3 /*break*/, 45];
                 _h = __read(_g.value, 2), index = _h[0], value = _h[1];
                 cookie = value;
                 return [4 /*yield*/, api('superBrandTaskList', { "source": "secondfloor", "activityId": activityId, "assistInfoFlag": 1 })];
-            case 37:
+            case 36:
                 res = _7.sent();
                 mine = '';
                 try {
@@ -296,49 +291,49 @@ var cookie = '', UserName = '', res = '', shareCodes = [], shareCodesSelf = [], 
                         }
                     });
                 };
+                _7.label = 37;
+            case 37:
+                _7.trys.push([37, 42, 43, 44]);
+                shareCodes_1 = (e_4 = void 0, __values(shareCodes)), shareCodes_1_1 = shareCodes_1.next();
                 _7.label = 38;
             case 38:
-                _7.trys.push([38, 43, 44, 45]);
-                shareCodes_1 = (e_4 = void 0, __values(shareCodes)), shareCodes_1_1 = shareCodes_1.next();
-                _7.label = 39;
-            case 39:
-                if (!!shareCodes_1_1.done) return [3 /*break*/, 42];
+                if (!!shareCodes_1_1.done) return [3 /*break*/, 41];
                 code = shareCodes_1_1.value;
                 return [5 /*yield**/, _loop_1(code)];
-            case 40:
+            case 39:
                 state_1 = _7.sent();
                 if (state_1 === "break")
-                    return [3 /*break*/, 42];
-                _7.label = 41;
-            case 41:
+                    return [3 /*break*/, 41];
+                _7.label = 40;
+            case 40:
                 shareCodes_1_1 = shareCodes_1.next();
-                return [3 /*break*/, 39];
-            case 42: return [3 /*break*/, 45];
-            case 43:
+                return [3 /*break*/, 38];
+            case 41: return [3 /*break*/, 44];
+            case 42:
                 e_4_1 = _7.sent();
                 e_4 = { error: e_4_1 };
-                return [3 /*break*/, 45];
-            case 44:
+                return [3 /*break*/, 44];
+            case 43:
                 try {
                     if (shareCodes_1_1 && !shareCodes_1_1.done && (_q = shareCodes_1["return"])) _q.call(shareCodes_1);
                 }
                 finally { if (e_4) throw e_4.error; }
                 return [7 /*endfinally*/];
-            case 45:
+            case 44:
                 _g = _f.next();
-                return [3 /*break*/, 36];
-            case 46: return [3 /*break*/, 49];
-            case 47:
+                return [3 /*break*/, 35];
+            case 45: return [3 /*break*/, 48];
+            case 46:
                 e_5_1 = _7.sent();
                 e_5 = { error: e_5_1 };
-                return [3 /*break*/, 49];
-            case 48:
+                return [3 /*break*/, 48];
+            case 47:
                 try {
                     if (_g && !_g.done && (_o = _f["return"])) _o.call(_f);
                 }
                 finally { if (e_5) throw e_5.error; }
                 return [7 /*endfinally*/];
-            case 49: return [2 /*return*/];
+            case 48: return [2 /*return*/];
         }
     });
 }); })();
