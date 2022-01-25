@@ -230,7 +230,7 @@ var cookie = '', res = '', UserName;
                 j = 0;
                 _h.label = 31;
             case 31:
-                if (!(j < 5)) return [3 /*break*/, 35];
+                if (!(j < 30)) return [3 /*break*/, 35];
                 return [4 /*yield*/, task()];
             case 32:
                 if ((_h.sent()) === 0) {
