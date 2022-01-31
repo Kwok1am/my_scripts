@@ -75,140 +75,143 @@ var cookie = '', res = '', UserName;
 !(function () { return __awaiter(void 0, void 0, void 0, function () {
     var cookiesArr, except, _a, _b, _c, index, value, j, _d, _e, t, _f, _g, tp, e_1_1, e_2_1, e_3, e_4_1;
     var e_4, _h, e_2, _j, e_1, _k;
-    var _l;
-    return __generator(this, function (_m) {
-        switch (_m.label) {
+    return __generator(this, function (_l) {
+        switch (_l.label) {
             case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
             case 1:
-                cookiesArr = _m.sent();
+                cookiesArr = _l.sent();
                 except = (0, TS_USER_AGENTS_1.exceptCookie)(path.basename(__filename));
-                _m.label = 2;
+                _l.label = 2;
             case 2:
-                _m.trys.push([2, 34, 35, 36]);
+                _l.trys.push([2, 35, 36, 37]);
                 _a = __values(cookiesArr.entries()), _b = _a.next();
-                _m.label = 3;
+                _l.label = 3;
             case 3:
-                if (!!_b.done) return [3 /*break*/, 33];
+                if (!!_b.done) return [3 /*break*/, 34];
                 _c = __read(_b.value, 2), index = _c[0], value = _c[1];
                 cookie = value;
                 UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)[1]);
                 console.log("\n\u5F00\u59CB\u3010\u4EAC\u4E1C\u8D26\u53F7".concat(index + 1, "\u3011").concat(UserName, "\n"));
                 if (except.includes(encodeURIComponent(UserName))) {
                     console.log('已设置跳过');
-                    return [3 /*break*/, 32];
+                    return [3 /*break*/, 33];
                 }
                 j = 0;
-                _m.label = 4;
+                _l.label = 4;
             case 4:
-                if (!(j < 3)) return [3 /*break*/, 32];
+                if (!(j < 3)) return [3 /*break*/, 33];
                 return [4 /*yield*/, api('jdhealth_getTaskDetail', { "buildingId": "", "taskId": "", "channelId": 1 })];
             case 5:
-                res = _m.sent();
-                _m.label = 6;
+                res = _l.sent();
+                _l.label = 6;
             case 6:
-                _m.trys.push([6, 28, , 29]);
-                _m.label = 7;
+                _l.trys.push([6, 29, , 30]);
+                _l.label = 7;
             case 7:
-                _m.trys.push([7, 25, 26, 27]);
+                _l.trys.push([7, 26, 27, 28]);
                 _d = (e_2 = void 0, __values(res.data.result.taskVos)), _e = _d.next();
-                _m.label = 8;
+                _l.label = 8;
             case 8:
-                if (!!_e.done) return [3 /*break*/, 24];
+                if (!!_e.done) return [3 /*break*/, 25];
                 t = _e.value;
-                if (!(t.status === 1 || t.status === 3)) return [3 /*break*/, 23];
+                if (!(t.status === 1 || t.status === 3)) return [3 /*break*/, 24];
                 console.log(t.taskName);
-                _m.label = 9;
+                _l.label = 9;
             case 9:
-                _m.trys.push([9, 21, 22, 23]);
+                _l.trys.push([9, 22, 23, 24]);
                 _f = (e_1 = void 0, __values(t.productInfoVos || t.followShopVo || t.shoppingActivityVos || [])), _g = _f.next();
-                _m.label = 10;
+                _l.label = 10;
             case 10:
-                if (!!_g.done) return [3 /*break*/, 20];
+                if (!!_g.done) return [3 /*break*/, 21];
                 tp = _g.value;
-                if (!(tp.status === 1)) return [3 /*break*/, 19];
+                if (!(tp.status === 1)) return [3 /*break*/, 20];
                 console.log('\t', tp.skuName || tp.shopName || tp.title);
                 if (!(t.taskName.includes('早睡打卡') && t.taskBeginTime < Date.now() && t.taskEndTime > Date.now())) return [3 /*break*/, 13];
                 return [4 /*yield*/, api('jdhealth_collectScore', { "taskToken": tp.taskToken, "taskId": t.taskId, "actionType": 1 })];
             case 11:
-                res = _m.sent();
+                res = _l.sent();
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
             case 12:
-                _m.sent();
+                _l.sent();
                 console.log('\t', res.data.bizMsg);
-                _m.label = 13;
+                _l.label = 13;
             case 13:
                 if (!t.waitDuration) return [3 /*break*/, 16];
                 return [4 /*yield*/, api('jdhealth_collectScore', { "taskToken": tp.taskToken, "taskId": t.taskId, "actionType": 1 })];
             case 14:
-                res = _m.sent();
+                res = _l.sent();
                 console.log('\t', res.data.bizMsg);
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(t.waitDuration * 1000)];
             case 15:
-                _m.sent();
-                _m.label = 16;
+                _l.sent();
+                _l.label = 16;
             case 16: return [4 /*yield*/, api('jdhealth_collectScore', { "taskToken": tp.taskToken, "taskId": t.taskId, "actionType": 0 })];
             case 17:
-                res = _m.sent();
-                console.log(res.data.bizMsg, ((_l = res.data.result) === null || _l === void 0 ? void 0 : _l.score) * 1 || res.data);
-                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(1500)];
+                res = _l.sent();
+                if (!(res.data.bizMsg.indexOf('做完') !== -1)) return [3 /*break*/, 18];
+                console.log(res.data.bizMsg);
+                return [3 /*break*/, 21];
             case 18:
-                _m.sent();
-                _m.label = 19;
+                console.log(res.data.bizMsg, res.data.result.score);
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(1500)];
             case 19:
+                _l.sent();
+                _l.label = 20;
+            case 20:
                 _g = _f.next();
                 return [3 /*break*/, 10];
-            case 20: return [3 /*break*/, 23];
-            case 21:
-                e_1_1 = _m.sent();
-                e_1 = { error: e_1_1 };
-                return [3 /*break*/, 23];
+            case 21: return [3 /*break*/, 24];
             case 22:
+                e_1_1 = _l.sent();
+                e_1 = { error: e_1_1 };
+                return [3 /*break*/, 24];
+            case 23:
                 try {
                     if (_g && !_g.done && (_k = _f["return"])) _k.call(_f);
                 }
                 finally { if (e_1) throw e_1.error; }
                 return [7 /*endfinally*/];
-            case 23:
+            case 24:
                 _e = _d.next();
                 return [3 /*break*/, 8];
-            case 24: return [3 /*break*/, 27];
-            case 25:
-                e_2_1 = _m.sent();
-                e_2 = { error: e_2_1 };
-                return [3 /*break*/, 27];
+            case 25: return [3 /*break*/, 28];
             case 26:
+                e_2_1 = _l.sent();
+                e_2 = { error: e_2_1 };
+                return [3 /*break*/, 28];
+            case 27:
                 try {
                     if (_e && !_e.done && (_j = _d["return"])) _j.call(_d);
                 }
                 finally { if (e_2) throw e_2.error; }
                 return [7 /*endfinally*/];
-            case 27: return [3 /*break*/, 29];
-            case 28:
-                e_3 = _m.sent();
+            case 28: return [3 /*break*/, 30];
+            case 29:
+                e_3 = _l.sent();
                 console.log('Error', e_3);
-                return [3 /*break*/, 32];
-            case 29: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
-            case 30:
-                _m.sent();
-                _m.label = 31;
+                return [3 /*break*/, 33];
+            case 30: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
             case 31:
+                _l.sent();
+                _l.label = 32;
+            case 32:
                 j++;
                 return [3 /*break*/, 4];
-            case 32:
+            case 33:
                 _b = _a.next();
                 return [3 /*break*/, 3];
-            case 33: return [3 /*break*/, 36];
-            case 34:
-                e_4_1 = _m.sent();
-                e_4 = { error: e_4_1 };
-                return [3 /*break*/, 36];
+            case 34: return [3 /*break*/, 37];
             case 35:
+                e_4_1 = _l.sent();
+                e_4 = { error: e_4_1 };
+                return [3 /*break*/, 37];
+            case 36:
                 try {
                     if (_b && !_b.done && (_h = _a["return"])) _h.call(_a);
                 }
                 finally { if (e_4) throw e_4.error; }
                 return [7 /*endfinally*/];
-            case 36: return [2 /*return*/];
+            case 37: return [2 /*return*/];
         }
     });
 }); })();
