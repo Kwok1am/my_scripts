@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * 农场补充任务
+ * cron: 0 11,12 * * *
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -46,103 +50,120 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 exports.__esModule = true;
-/**
- * 农场补充任务
- * cron: 0 11,12 * * *
- */
 var axios_1 = require("axios");
 var TS_USER_AGENTS_1 = require("./TS_USER_AGENTS");
-var dotenv = require("dotenv");
-var notify = require('./sendNotify');
-dotenv.config();
-var cookie = '', res = '';
-var UserName, index;
+var cookie = '', res = '', UserName;
 !(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var cookiesArr, i, _a, isLogin, nickName, k, _b, _c, t, e_1_1;
-    var e_1, _d;
-    return __generator(this, function (_e) {
-        switch (_e.label) {
+    var cookiesArr, _a, _b, _c, index, value, k, _d, _e, t, e_1_1, e_2_1;
+    var e_2, _f, e_1, _g;
+    return __generator(this, function (_h) {
+        switch (_h.label) {
             case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
             case 1:
-                cookiesArr = _e.sent();
-                i = 0;
-                _e.label = 2;
+                cookiesArr = _h.sent();
+                _h.label = 2;
             case 2:
-                if (!(i < cookiesArr.length)) return [3 /*break*/, 21];
-                cookie = cookiesArr[i];
-                UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)[1]);
-                index = i + 1;
-                return [4 /*yield*/, (0, TS_USER_AGENTS_1.TotalBean)(cookie)];
+                _h.trys.push([2, 22, 23, 24]);
+                _a = __values(cookiesArr.entries()), _b = _a.next();
+                _h.label = 3;
             case 3:
-                _a = _e.sent(), isLogin = _a.isLogin, nickName = _a.nickName;
-                if (!isLogin) {
-                    notify.sendNotify(__filename.split('/').pop(), "cookie\u5DF2\u5931\u6548\n\u4EAC\u4E1C\u8D26\u53F7".concat(index, "\uFF1A").concat(nickName || UserName));
-                    return [3 /*break*/, 20];
-                }
-                console.log("\n\u5F00\u59CB\u3010\u4EAC\u4E1C\u8D26\u53F7".concat(index, "\u3011").concat(nickName || UserName, "\n"));
+                if (!!_b.done) return [3 /*break*/, 21];
+                _c = __read(_b.value, 2), index = _c[0], value = _c[1];
+                cookie = value;
+                UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)[1]);
+                console.log("\n\u5F00\u59CB\u3010\u4EAC\u4E1C\u8D26\u53F7".concat(index + 1, "\u3011").concat(UserName, "\n"));
                 k = 0;
-                _e.label = 4;
+                _h.label = 4;
             case 4:
                 if (!(k < 3)) return [3 /*break*/, 20];
                 console.log("round:".concat(k + 1));
                 return [4 /*yield*/, api("taskInitForFarm", { "version": 14, "channel": 1, "babelChannel": "120" })];
             case 5:
-                res = _e.sent();
-                _e.label = 6;
+                res = _h.sent();
+                _h.label = 6;
             case 6:
-                _e.trys.push([6, 15, 16, 17]);
-                _b = (e_1 = void 0, __values(res.gotBrowseTaskAdInit.userBrowseTaskAds)), _c = _b.next();
-                _e.label = 7;
+                _h.trys.push([6, 15, 16, 17]);
+                _d = (e_1 = void 0, __values(res.gotBrowseTaskAdInit.userBrowseTaskAds)), _e = _d.next();
+                _h.label = 7;
             case 7:
-                if (!!_c.done) return [3 /*break*/, 14];
-                t = _c.value;
+                if (!!_e.done) return [3 /*break*/, 14];
+                t = _e.value;
                 if (!(t.limit !== t.hadGotTimes)) return [3 /*break*/, 13];
-                if (!(t.hadFinishedTimes !== 0)) return [3 /*break*/, 9];
+                if (!(t.hadFinishedTimes !== 0)) return [3 /*break*/, 10];
                 return [4 /*yield*/, api("browseAdTaskForFarm", { "advertId": t.advertId, "type": 1, "version": 14, "channel": 1, "babelChannel": "120" })];
             case 8:
                 // 领取
-                res = _e.sent();
+                res = _h.sent();
                 console.log('领取水滴：', res.amount);
-                return [3 /*break*/, 11];
-            case 9: return [4 /*yield*/, api("browseAdTaskForFarm", { "advertId": t.advertId, "type": 0, "version": 14, "channel": 1, "babelChannel": "120" })];
-            case 10:
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
+            case 9:
+                _h.sent();
+                return [3 /*break*/, 13];
+            case 10: return [4 /*yield*/, api("browseAdTaskForFarm", { "advertId": t.advertId, "type": 0, "version": 14, "channel": 1, "babelChannel": "120" })];
+            case 11:
                 // 做任务
-                res = _e.sent();
+                res = _h.sent();
                 if (res.code === '0')
                     console.log("".concat(t.mainTitle, "\uFF1A\u4EFB\u52A1\u5B8C\u6210"));
                 else
                     console.log("".concat(t.mainTitle, "\uFF1A\u4EFB\u52A1\u5931\u8D25-").concat(res.code));
-                _e.label = 11;
-            case 11: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)((t.time || 3) * 1000)];
             case 12:
-                _e.sent();
-                _e.label = 13;
+                _h.sent();
+                _h.label = 13;
             case 13:
-                _c = _b.next();
+                _e = _d.next();
                 return [3 /*break*/, 7];
             case 14: return [3 /*break*/, 17];
             case 15:
-                e_1_1 = _e.sent();
+                e_1_1 = _h.sent();
                 e_1 = { error: e_1_1 };
                 return [3 /*break*/, 17];
             case 16:
                 try {
-                    if (_c && !_c.done && (_d = _b["return"])) _d.call(_b);
+                    if (_e && !_e.done && (_g = _d["return"])) _g.call(_d);
                 }
                 finally { if (e_1) throw e_1.error; }
                 return [7 /*endfinally*/];
             case 17: return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
             case 18:
-                _e.sent();
-                _e.label = 19;
+                _h.sent();
+                _h.label = 19;
             case 19:
                 k++;
                 return [3 /*break*/, 4];
             case 20:
-                i++;
-                return [3 /*break*/, 2];
-            case 21: return [2 /*return*/];
+                _b = _a.next();
+                return [3 /*break*/, 3];
+            case 21: return [3 /*break*/, 24];
+            case 22:
+                e_2_1 = _h.sent();
+                e_2 = { error: e_2_1 };
+                return [3 /*break*/, 24];
+            case 23:
+                try {
+                    if (_b && !_b.done && (_f = _a["return"])) _f.call(_a);
+                }
+                finally { if (e_2) throw e_2.error; }
+                return [7 /*endfinally*/];
+            case 24: return [2 /*return*/];
         }
     });
 }); })();
