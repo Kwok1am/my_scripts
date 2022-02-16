@@ -123,4 +123,3 @@ export {
   get,
   makeShareCodes,
 }
-
