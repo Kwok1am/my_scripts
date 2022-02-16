@@ -81,85 +81,66 @@ var sendNotify_1 = require("./sendNotify");
 var TS_USER_AGENTS_1 = require("./TS_USER_AGENTS");
 var cookie = '', UserName = '', res = '', message = '', shareCodes = [], shareCodesSelf = [], shareCodesHW = [];
 !(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var cookiesArr, activityId, _a, _b, _c, index, value, encryptProjectId, _d, _e, t, tp, e_1, e_2_1, sum, userStarNum, i, e_3_1, full, _f, _g, _h, index, value, mine, _j, _k, t, _loop_1, shareCodes_1, shareCodes_1_1, code, state_1, e_4_1, e_5_1;
-    var e_3, _l, e_2, _m, e_5, _o, e_6, _p, e_4, _q;
-    var _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6;
-    return __generator(this, function (_7) {
-        switch (_7.label) {
+    var cookiesArr, activityId, _a, _b, _c, index, value, encryptProjectId, _d, _e, t, tp, e_1_1, sum, userStarNum, i, e_2_1, full, _f, _g, _h, index, value, _loop_1, shareCodes_1, shareCodes_1_1, code, state_1, e_3_1, e_4_1;
+    var e_2, _j, e_1, _k, e_4, _l, e_3, _m;
+    var _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
+    return __generator(this, function (_0) {
+        switch (_0.label) {
             case 0: return [4 /*yield*/, (0, TS_USER_AGENTS_1.requireConfig)()];
             case 1:
-                cookiesArr = _7.sent();
-                _7.label = 2;
+                cookiesArr = _0.sent();
+                _0.label = 2;
             case 2:
-                _7.trys.push([2, 31, 32, 33]);
+                _0.trys.push([2, 25, 26, 27]);
                 _a = __values(cookiesArr.entries()), _b = _a.next();
-                _7.label = 3;
+                _0.label = 3;
             case 3:
-                if (!!_b.done) return [3 /*break*/, 30];
+                if (!!_b.done) return [3 /*break*/, 24];
                 _c = __read(_b.value, 2), index = _c[0], value = _c[1];
                 cookie = value;
                 UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)[1]);
                 console.log("\n\u5F00\u59CB\u3010\u4EAC\u4E1C\u8D26\u53F7".concat(index + 1, "\u3011").concat(UserName, "\n"));
-                return [4 /*yield*/, api('superBrandSecondFloorMainPage', { "source": "secondfloor" })];
+                return [4 /*yield*/, api('showSecondFloorRunInfo', { "source": "run" })];
             case 4:
-                res = _7.sent();
+                res = _0.sent();
                 activityId = res.data.result.activityBaseInfo.activityId;
                 encryptProjectId = res.data.result.activityBaseInfo.encryptProjectId;
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(1000)
                     // 任务
                 ];
             case 5:
-                _7.sent();
-                return [4 /*yield*/, api('superBrandTaskList', { "source": "secondfloor", "activityId": activityId, "assistInfoFlag": 1 })];
+                _0.sent();
+                return [4 /*yield*/, api('superBrandTaskList', { "source": "run", "activityId": activityId, "assistInfoFlag": 1 })];
             case 6:
                 // 任务
-                res = _7.sent();
+                res = _0.sent();
                 (0, TS_USER_AGENTS_1.o2s)(res);
-                _7.label = 7;
+                _0.label = 7;
             case 7:
-                _7.trys.push([7, 20, 21, 22]);
-                _d = (e_2 = void 0, __values(res.data.result.taskList)), _e = _d.next();
-                _7.label = 8;
+                _0.trys.push([7, 14, 15, 16]);
+                _d = (e_1 = void 0, __values(res.data.result.taskList)), _e = _d.next();
+                _0.label = 8;
             case 8:
-                if (!!_e.done) return [3 /*break*/, 19];
+                if (!!_e.done) return [3 /*break*/, 13];
                 t = _e.value;
-                if (!(t.completionCnt !== t.assignmentTimesLimit)) return [3 /*break*/, 17];
-                if (!(((_r = t.ext) === null || _r === void 0 ? void 0 : _r.shoppingActivity) || ((_s = t.ext) === null || _s === void 0 ? void 0 : _s.followShop))) return [3 /*break*/, 11];
-                tp = ((_t = t.ext) === null || _t === void 0 ? void 0 : _t.shoppingActivity) || ((_u = t.ext) === null || _u === void 0 ? void 0 : _u.followShop);
+                if (!(t.completionCnt !== t.assignmentTimesLimit)) return [3 /*break*/, 12];
+                if (!(((_o = t.ext) === null || _o === void 0 ? void 0 : _o.shoppingActivity) || ((_p = t.ext) === null || _p === void 0 ? void 0 : _p.followShop))) return [3 /*break*/, 11];
+                tp = ((_q = t.ext) === null || _q === void 0 ? void 0 : _q.shoppingActivity) || ((_r = t.ext) === null || _r === void 0 ? void 0 : _r.followShop);
                 tp = tp[0];
                 console.log(tp.title || tp.shopName, tp.itemId);
-                return [4 /*yield*/, api('superBrandDoTask', { "source": "secondfloor", "activityId": activityId, "encryptProjectId": encryptProjectId, "encryptAssignmentId": t.encryptAssignmentId, "assignmentType": t.assignmentType, "itemId": tp.itemId, "actionType": 0 })];
+                return [4 /*yield*/, api('superBrandDoTask', { "source": "run", "activityId": activityId, "encryptProjectId": encryptProjectId, "encryptAssignmentId": t.encryptAssignmentId, "assignmentType": t.assignmentType, "itemId": tp.itemId, "actionType": 0 })];
             case 9:
-                res = _7.sent();
-                console.log((_v = res.data) === null || _v === void 0 ? void 0 : _v.bizMsg);
+                res = _0.sent();
+                console.log((_s = res.data) === null || _s === void 0 ? void 0 : _s.bizMsg);
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
             case 10:
-                _7.sent();
-                _7.label = 11;
+                _0.sent();
+                return [3 /*break*/, 12];
             case 11:
-                if (!((_w = t.ext) === null || _w === void 0 ? void 0 : _w.sign2)) return [3 /*break*/, 17];
-                _7.label = 12;
-            case 12:
-                _7.trys.push([12, 16, , 17]);
-                if (!(new Date().getHours() >= 14 && new Date().getHours() <= 20)) return [3 /*break*/, 15];
-                return [4 /*yield*/, api('superBrandDoTask', { "source": "secondfloor", "activityId": activityId, "encryptProjectId": encryptProjectId, "encryptAssignmentId": t.encryptAssignmentId, "assignmentType": t.assignmentType, "itemId": t.ext.sign2[0].itemId, "actionType": 0 })];
-            case 13:
-                res = _7.sent();
-                console.log((_x = res.data) === null || _x === void 0 ? void 0 : _x.bizMsg);
-                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
-            case 14:
-                _7.sent();
-                _7.label = 15;
-            case 15: return [3 /*break*/, 17];
-            case 16:
-                e_1 = _7.sent();
-                console.log((_y = t.ext) === null || _y === void 0 ? void 0 : _y.sign2);
-                return [3 /*break*/, 17];
-            case 17:
-                // 助力码
-                if ((_z = t.ext) === null || _z === void 0 ? void 0 : _z.assistTaskDetail) {
+                if ((_t = t.ext) === null || _t === void 0 ? void 0 : _t.assistTaskDetail) {
+                    // 助力码
                     console.log('助力码：', t.ext.assistTaskDetail.itemId);
-                    console.log('收到助力：', (_2 = (_1 = (_0 = t.ext) === null || _0 === void 0 ? void 0 : _0.assistList) === null || _1 === void 0 ? void 0 : _1.length) !== null && _2 !== void 0 ? _2 : 0);
+                    console.log('收到助力：', (_w = (_v = (_u = t.ext) === null || _u === void 0 ? void 0 : _u.assistList) === null || _v === void 0 ? void 0 : _v.length) !== null && _w !== void 0 ? _w : 0);
                     shareCodesSelf.push({
                         activityId: activityId,
                         encryptProjectId: encryptProjectId,
@@ -167,109 +148,99 @@ var cookie = '', UserName = '', res = '', message = '', shareCodes = [], shareCo
                         itemId: t.ext.assistTaskDetail.itemId
                     });
                 }
-                _7.label = 18;
-            case 18:
+                _0.label = 12;
+            case 12:
                 _e = _d.next();
                 return [3 /*break*/, 8];
-            case 19: return [3 /*break*/, 22];
-            case 20:
-                e_2_1 = _7.sent();
-                e_2 = { error: e_2_1 };
-                return [3 /*break*/, 22];
-            case 21:
+            case 13: return [3 /*break*/, 16];
+            case 14:
+                e_1_1 = _0.sent();
+                e_1 = { error: e_1_1 };
+                return [3 /*break*/, 16];
+            case 15:
                 try {
-                    if (_e && !_e.done && (_m = _d["return"])) _m.call(_d);
+                    if (_e && !_e.done && (_k = _d["return"])) _k.call(_d);
                 }
-                finally { if (e_2) throw e_2.error; }
+                finally { if (e_1) throw e_1.error; }
                 return [7 /*endfinally*/];
-            case 22:
-                if (!(new Date().getHours() === 22)) return [3 /*break*/, 29];
+            case 16:
+                if (!(new Date().getHours() === 23)) return [3 /*break*/, 23];
                 sum = 0;
-                return [4 /*yield*/, api('superBrandSecondFloorMainPage', { "source": "secondfloor" })];
-            case 23:
-                res = _7.sent();
-                userStarNum = res.data.result.activityUserInfo.userStarNum;
+                return [4 /*yield*/, api('showSecondFloorRunInfo', { "source": "run" })];
+            case 17:
+                res = _0.sent();
+                userStarNum = Math.floor(res.data.result.activityUserInfo.userStarNum / 300);
                 console.log('可以抽奖', userStarNum, '次');
                 i = 0;
-                _7.label = 24;
-            case 24:
-                if (!(i < userStarNum)) return [3 /*break*/, 28];
-                return [4 /*yield*/, api('superBrandTaskLottery', { "source": "secondfloor", "activityId": activityId })];
-            case 25:
-                res = _7.sent();
-                if ((_5 = (_4 = (_3 = res.data.result) === null || _3 === void 0 ? void 0 : _3.rewardComponent) === null || _4 === void 0 ? void 0 : _4.beanList) === null || _5 === void 0 ? void 0 : _5.length) {
+                _0.label = 18;
+            case 18:
+                if (!(i < userStarNum)) return [3 /*break*/, 22];
+                return [4 /*yield*/, api('superBrandTaskLottery', { "source": "run", "activityId": activityId })];
+            case 19:
+                res = _0.sent();
+                if ((_z = (_y = (_x = res.data.result) === null || _x === void 0 ? void 0 : _x.rewardComponent) === null || _y === void 0 ? void 0 : _y.beanList) === null || _z === void 0 ? void 0 : _z.length) {
                     console.log('抽奖获得京豆：', res.data.result.rewardComponent.beanList[0].quantity);
                     sum += res.data.result.rewardComponent.beanList[0].quantity;
                 }
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
-            case 26:
-                _7.sent();
-                _7.label = 27;
-            case 27:
+            case 20:
+                _0.sent();
+                _0.label = 21;
+            case 21:
                 i++;
-                return [3 /*break*/, 24];
-            case 28:
+                return [3 /*break*/, 18];
+            case 22:
                 message += "\u3010\u4EAC\u4E1C\u8D26\u53F7".concat(index + 1, "\u3011").concat(UserName, "\n\u62BD\u5956").concat(userStarNum, "\u6B21\uFF0C\u83B7\u5F97\u4EAC\u8C46").concat(sum, "\n\n");
-                _7.label = 29;
-            case 29:
+                _0.label = 23;
+            case 23:
                 _b = _a.next();
                 return [3 /*break*/, 3];
-            case 30: return [3 /*break*/, 33];
-            case 31:
-                e_3_1 = _7.sent();
-                e_3 = { error: e_3_1 };
-                return [3 /*break*/, 33];
-            case 32:
+            case 24: return [3 /*break*/, 27];
+            case 25:
+                e_2_1 = _0.sent();
+                e_2 = { error: e_2_1 };
+                return [3 /*break*/, 27];
+            case 26:
                 try {
-                    if (_b && !_b.done && (_l = _a["return"])) _l.call(_a);
+                    if (_b && !_b.done && (_j = _a["return"])) _j.call(_a);
                 }
-                finally { if (e_3) throw e_3.error; }
+                finally { if (e_2) throw e_2.error; }
                 return [7 /*endfinally*/];
-            case 33: return [4 /*yield*/, (0, sendNotify_1.sendNotify)('京东-下拉', message)];
-            case 34:
-                _7.sent();
+            case 27: return [4 /*yield*/, (0, sendNotify_1.sendNotify)('京东特物', message)];
+            case 28:
+                _0.sent();
+                console.log(shareCodesSelf);
+                return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(3000)];
+            case 29:
+                _0.sent();
                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.getshareCodeHW)('tewu')];
-            case 35:
-                shareCodesHW = _7.sent();
-                shareCodes = __spreadArray(__spreadArray([], __read(shareCodesSelf), false), __read(shareCodesHW), false);
+            case 30:
+                shareCodesHW = _0.sent();
                 full = [];
-                _7.label = 36;
-            case 36:
-                _7.trys.push([36, 48, 49, 50]);
+                _0.label = 31;
+            case 31:
+                _0.trys.push([31, 43, 44, 45]);
                 _f = __values(cookiesArr.entries()), _g = _f.next();
-                _7.label = 37;
-            case 37:
-                if (!!_g.done) return [3 /*break*/, 47];
+                _0.label = 32;
+            case 32:
+                if (!!_g.done) return [3 /*break*/, 42];
                 _h = __read(_g.value, 2), index = _h[0], value = _h[1];
+                shareCodes = index === 0
+                    ? Array.from(new Set(__spreadArray(__spreadArray([], __read(shareCodesHW), false), __read(shareCodesSelf), false)))
+                    : Array.from(new Set(__spreadArray(__spreadArray([], __read(shareCodesSelf), false), __read(shareCodesHW), false)));
                 cookie = value;
-                return [4 /*yield*/, api('superBrandTaskList', { "source": "secondfloor", "activityId": activityId, "assistInfoFlag": 1 })];
-            case 38:
-                res = _7.sent();
-                mine = '';
-                try {
-                    for (_j = (e_6 = void 0, __values(res.data.result.taskList)), _k = _j.next(); !_k.done; _k = _j.next()) {
-                        t = _k.value;
-                        if ((_6 = t.ext) === null || _6 === void 0 ? void 0 : _6.assistTaskDetail) {
-                            mine = t.ext.assistTaskDetail.itemId;
-                        }
-                    }
-                }
-                catch (e_6_1) { e_6 = { error: e_6_1 }; }
-                finally {
-                    try {
-                        if (_k && !_k.done && (_p = _j["return"])) _p.call(_j);
-                    }
-                    finally { if (e_6) throw e_6.error; }
-                }
+                return [4 /*yield*/, api('superBrandTaskList', { "source": "run", "activityId": activityId, "assistInfoFlag": 1 })];
+            case 33:
+                res = _0.sent();
                 _loop_1 = function (code) {
-                    return __generator(this, function (_8) {
-                        switch (_8.label) {
+                    return __generator(this, function (_1) {
+                        switch (_1.label) {
                             case 0:
-                                if (!(code.itemId !== mine && !full.includes(code.itemId))) return [3 /*break*/, 3];
+                                if (!!full.includes(code.itemId)) return [3 /*break*/, 3];
                                 console.log("\u8D26\u53F7".concat(index + 1, " \u53BB\u52A9\u529B ").concat(code.itemId, " ").concat(shareCodesSelf.some(function (self) { return self.itemId === code.itemId; }) ? '*内部*' : ''));
-                                return [4 /*yield*/, api('superBrandDoTask', { "source": "secondfloor", "activityId": code.activityId, "encryptProjectId": code.encryptProjectId, "encryptAssignmentId": code.encryptAssignmentId, "assignmentType": 2, "itemId": code.itemId, "actionType": 0 })];
+                                return [4 /*yield*/, api('superBrandDoTask', { "source": "run", "activityId": code.activityId, "encryptProjectId": code.encryptProjectId, "encryptAssignmentId": code.encryptAssignmentId, "assignmentType": 2, "itemId": code.itemId, "actionType": 0 })];
                             case 1:
-                                res = _8.sent();
+                                res = _1.sent();
                                 if (res.data.bizCode === '0') {
                                     console.log('助力成功');
                                 }
@@ -290,58 +261,58 @@ var cookie = '', UserName = '', res = '', message = '', shareCodes = [], shareCo
                                 }
                                 return [4 /*yield*/, (0, TS_USER_AGENTS_1.wait)(2000)];
                             case 2:
-                                _8.sent();
+                                _1.sent();
                                 return [3 /*break*/, 4];
                             case 3:
                                 console.log('助力满了，跳过');
-                                _8.label = 4;
+                                _1.label = 4;
                             case 4: return [2 /*return*/];
                         }
                     });
                 };
-                _7.label = 39;
-            case 39:
-                _7.trys.push([39, 44, 45, 46]);
-                shareCodes_1 = (e_4 = void 0, __values(shareCodes)), shareCodes_1_1 = shareCodes_1.next();
-                _7.label = 40;
-            case 40:
-                if (!!shareCodes_1_1.done) return [3 /*break*/, 43];
+                _0.label = 34;
+            case 34:
+                _0.trys.push([34, 39, 40, 41]);
+                shareCodes_1 = (e_3 = void 0, __values(shareCodes)), shareCodes_1_1 = shareCodes_1.next();
+                _0.label = 35;
+            case 35:
+                if (!!shareCodes_1_1.done) return [3 /*break*/, 38];
                 code = shareCodes_1_1.value;
                 return [5 /*yield**/, _loop_1(code)];
-            case 41:
-                state_1 = _7.sent();
+            case 36:
+                state_1 = _0.sent();
                 if (state_1 === "break")
-                    return [3 /*break*/, 43];
-                _7.label = 42;
-            case 42:
+                    return [3 /*break*/, 38];
+                _0.label = 37;
+            case 37:
                 shareCodes_1_1 = shareCodes_1.next();
-                return [3 /*break*/, 40];
-            case 43: return [3 /*break*/, 46];
-            case 44:
-                e_4_1 = _7.sent();
-                e_4 = { error: e_4_1 };
-                return [3 /*break*/, 46];
-            case 45:
+                return [3 /*break*/, 35];
+            case 38: return [3 /*break*/, 41];
+            case 39:
+                e_3_1 = _0.sent();
+                e_3 = { error: e_3_1 };
+                return [3 /*break*/, 41];
+            case 40:
                 try {
-                    if (shareCodes_1_1 && !shareCodes_1_1.done && (_q = shareCodes_1["return"])) _q.call(shareCodes_1);
+                    if (shareCodes_1_1 && !shareCodes_1_1.done && (_m = shareCodes_1["return"])) _m.call(shareCodes_1);
+                }
+                finally { if (e_3) throw e_3.error; }
+                return [7 /*endfinally*/];
+            case 41:
+                _g = _f.next();
+                return [3 /*break*/, 32];
+            case 42: return [3 /*break*/, 45];
+            case 43:
+                e_4_1 = _0.sent();
+                e_4 = { error: e_4_1 };
+                return [3 /*break*/, 45];
+            case 44:
+                try {
+                    if (_g && !_g.done && (_l = _f["return"])) _l.call(_f);
                 }
                 finally { if (e_4) throw e_4.error; }
                 return [7 /*endfinally*/];
-            case 46:
-                _g = _f.next();
-                return [3 /*break*/, 37];
-            case 47: return [3 /*break*/, 50];
-            case 48:
-                e_5_1 = _7.sent();
-                e_5 = { error: e_5_1 };
-                return [3 /*break*/, 50];
-            case 49:
-                try {
-                    if (_g && !_g.done && (_o = _f["return"])) _o.call(_f);
-                }
-                finally { if (e_5) throw e_5.error; }
-                return [7 /*endfinally*/];
-            case 50: return [2 /*return*/];
+            case 45: return [2 /*return*/];
         }
     });
 }); })();
@@ -350,7 +321,7 @@ function api(fn, body) {
         var data;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, axios_1["default"].post("https://api.m.jd.com/api?functionId=".concat(fn, "&appid=ProductZ4Brand&client=wh5&t=").concat(Date.now(), "&body=").concat(encodeURIComponent(JSON.stringify(body))), '', {
+                case 0: return [4 /*yield*/, axios_1["default"].post("https://api.m.jd.com/?uuid=&client=wh5&appid=ProductZ4Brand&functionId=".concat(fn, "&t=").concat(Date.now(), "&body=").concat(encodeURIComponent(JSON.stringify(body))), '', {
                         headers: {
                             'Host': 'api.m.jd.com',
                             'Origin': 'https://pro.m.jd.com',
