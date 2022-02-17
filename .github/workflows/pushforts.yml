@@ -52,6 +52,7 @@ jobs:
         #rm -rf ./Wenmoux
         echo "========= 开始下载JDHelloWorld的脚本 ========="
         git clone -b main https://github.com/JDHelloWorld/jd_scripts.git ./JDHelloWorld
+        mkdir utils
         rm -r ./JDHelloWorld/jd_cfd*.ts ./JDHelloWorld/jd_getUp.ts  ./JDHelloWorld/jd_jxmc.ts ./JDHelloWorld/jd_bean_change.js ./JDHelloWorld/jd_喂猪.ts ./JDHelloWorld/jd_jxScore.ts  ./JDHelloWorld/jd_jxmc_stock.ts
         rm -rf ./JDHelloWorld/jd_getShareCodes.ts ./JDHelloWorld/jd_jxgc_help.ts ./JDHelloWorld/jd_joy_reward.ts ./JDHelloWorld/jd_qq_pasture.ts ./JDHelloWorld/jd_speed_redEnvelope.ts ./JDHelloWorld/jx_box.ts
         #mv ./JDHelloWorld/githubAction.md ./githubAction.md
