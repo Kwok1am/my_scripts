@@ -1,0 +1,83 @@
+name: jd_ts
+on:
+  schedule:
+    - cron: 5 */2 * * *
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: Ubuntu-20.04  
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install build dependencies
+      run: |
+        sudo apt install rename -y
+        sudo npm install -g typescript
+    - name: down
+      run: |
+        echo "========= 开始下载smiek2221的脚本 ========="
+        git clone https://github.com/smiek2121/scripts.git  ./smiek2221
+        rm -r ./smiek2221/USER_AGENTS.js
+        mv ./smiek2221/JDJRValidator_Pure.js ./JDJRValidator_Pure.js
+        mv ./smiek2221/ZooFaker_Necklace.js ./ZooFaker_Necklace.js
+        mv ./smiek2221/sign_graphics_validate.js ./sign_graphics_validate.js
+        mv ./smiek2221/gua_wealth_island.js ./jd_cfd.js
+        mv ./smiek2221/gua_wealth_island_help.js ./jd_cfd_help.js
+        mv ./smiek2221/jd_sign_graphics.js ./jd_sign_graphics.js
+        mv ./smiek2221/cleancart_activity.js ./cleancart_activity.js
+        mv ./smiek2221/gua_*.js ./
+        rm -rf ./smiek2221
+        #echo "========= 给js添加作者名称 ========="
+        #rename 's/\.js/smiek2221.js/' ./smiek2221/*
+        #cp -f ./smiek2221/*_*.js ./
+        #echo "========= 开始下载cdle的脚本 ========="
+        #git clone https://github.com/cdle/carry.git  ./cdle
+        #mv ./cdle/jd_hyj.js ./jd_hyj.js
+        #rm -r ./cdle/scripts/jd_cash_exchange.js ./cdle/scripts/jd_earn30.js ./cdle/scripts/USER_AGENTS.js
+        #echo "========= 给js添加作者名称 ========="
+        #rename 's/\.js/cdle.js/' ./cdle/scripts/*
+        #cp -f ./cdle/scripts/*_*.js ./
+        #rm -rf ./cdle
+        #echo "========= 开始下载star261的脚本 ========="
+        #git clone -b main https://github.com/star261/jd.git  ./star261
+        #rm -r ./star261/scripts/jd_ddworld.js
+        #mv ./star261/scripts/jd_jxmc.js ./jd_jxmc.js
+        #cp -f ./star261/scripts/jd_*.js ./
+        #rm -rf ./star261
+        #echo "========= 开始下载Wenmoux的脚本 ========="
+        #git clone -b wen https://github.com/Wenmoux/scripts.git ./Wenmoux
+        #mv ./Wenmoux/jd/chinnkarahoi_jd_bookshop.js ./jd_bookshopWenmoux.js
+        #echo "========= 给js添加作者名称 ========="
+        #rename 's/\.js/wenmoux.js/' ./Wenmoux/jd/*
+        #cp -f ./Wenmoux/jd/*_*.js ./
+        #rm -rf ./Wenmoux
+        echo "========= 开始下载JDHelloWorld的脚本 ========="
+        git clone -b main https://github.com/JDHelloWorld/jd_scripts.git ./JDHelloWorld
+        rm -r ./JDHelloWorld/jd_cfd*.ts ./JDHelloWorld/jd_getUp.ts  ./JDHelloWorld/jd_jxmc.ts ./JDHelloWorld/jd_bean_change.js ./JDHelloWorld/jd_喂猪.ts ./JDHelloWorld/jd_jxScore.ts  ./JDHelloWorld/jd_jxmc_stock.ts
+        rm -rf ./JDHelloWorld/jd_getShareCodes.ts ./JDHelloWorld/jd_jxgc_help.ts ./JDHelloWorld/jd_joy_reward.ts ./JDHelloWorld/jd_qq_pasture.ts ./JDHelloWorld/jd_speed_redEnvelope.ts ./JDHelloWorld/jx_box.ts
+        #mv ./JDHelloWorld/githubAction.md ./githubAction.md
+        cp -f ./JDHelloWorld/sendNotify.js ./sendNotify.js
+        mv ./JDHelloWorld/utils/*.json ./utils/
+        mv ./JDHelloWorld/utils/*.js ./utils/
+        cp -f ./JDHelloWorld/utils/*.ts ./utils/
+        cd ./JDHelloWorld
+        #echo "========= 开始安装依赖 ========="
+        #sudo npm install
+        #echo "========= 开始转换JDHelloWorld的ts ========="
+        #tsc ./*.ts --downlevelIteration
+        cd ..
+        cp -f ./JDHelloWorld/*_*.js ./
+        cp -f ./JDHelloWorld/*_*.ts ./
+        #cp -f ./JDHelloWorld/*_*.ts ./activity
+        rm -rf ./JDHelloWorld
+    - name: 'Commit Files'
+      id: commit
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git diff --quiet && git diff --staged --quiet || git commit -am '.更新'
+    - name: Push Dust
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.PAT }}
+        branch: push
