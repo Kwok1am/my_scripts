@@ -4,6 +4,7 @@ on:
     - cron: 5 */2 * * *
   watch:
     types: started
+  workflow_dispatch:
 jobs:
   build:
     runs-on: Ubuntu-20.04  
