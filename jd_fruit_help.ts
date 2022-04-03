@@ -1,10 +1,10 @@
 /**
- * 京东-农场助力
+ * 京东-东东农场-助力
  * 所有CK助力顺序
  * 内部 -> 助力池
  * 和jd_fruit.js同方法自己设置内部码
  * 如果没有添加内部码，直接助力助力池
- * cron: 45 0,5 * * *
+ * cron: 35 0,3,5 * * *
  */
 
 import axios from 'axios'
@@ -12,7 +12,7 @@ import USER_AGENT, {get, getRandomNumberByRange, getShareCodePool, o2s, requireC
 
 let cookie: string = '', res: any = '', data: any, UserName: string
 let shareCodeSelf: string[] = [], shareCodePool: string[] = [], shareCode: string[] = [], shareCodeFile: object = require('./jdFruitShareCodes')
-let message: string = ''
+let message: string = '', log: { help: string, runTimes: string } = {help: '', runTimes: ''}
 
 !(async () => {
   let cookiesArr: string[] = await requireConfig()
@@ -21,11 +21,15 @@ let message: string = ''
     UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
     console.log(`\n开始【京东账号${index + 1}】${UserName}\n`)
     message += `【账号${index + 1}】  ${UserName}\n`
+    log.help += `【账号${index + 1}】  ${UserName}\n`
+    log.runTimes += `【账号${index + 1}】  ${UserName}\n`
 
     if (Object.keys(shareCodeFile)[index]) {
       shareCodeSelf = shareCodeFile[Object.keys(shareCodeFile)[index]].split('@')
     }
     o2s(shareCodeSelf, `第${index + 1}个账号获取的内部互助`)
+    console.log('⬆️ 检查是否获取到内部互助码，有问题及时停止运行，15秒后开始执行')
+    await wait(15000)
 
     res = await api('initForFarm', {"version": 11, "channel": 3})
     try {
@@ -34,9 +38,11 @@ let message: string = ''
         try {
           res = await get(`https://api.jdsharecode.xyz/api/runTimes?activityId=farm&sharecode=${res.farmUserPro.shareCode}`)
           console.log(res)
+          log.runTimes += `第${i + 1}次${res}\n`
           break
         } catch (e) {
           console.log(`第${i + 1}次上报失败`)
+          log.runTimes += `第${i + 1}次上报失败\n`
           await wait(getRandomNumberByRange(10000, 30000))
         }
       }
@@ -45,11 +51,10 @@ let message: string = ''
       console.log('获取助力码失败，黑号？')
       continue
     }
-
     await wait(1000)
 
     // 助力
-    shareCodePool = await getShareCodePool('farm', 30)
+    shareCodePool = await getShareCodePool('farm', 50)
     shareCode = Array.from(new Set([...shareCodeSelf, ...shareCodePool]))
 
     for (let code of shareCodeSelf) {
@@ -60,11 +65,13 @@ let message: string = ''
         console.log('不给自己助力')
       } else if (res.helpResult.code === '0') {
         console.log('助力成功,获得', res.helpResult.salveHelpAddWater)
+        log.help += `助力成功 ${code} ${shareCodeSelf.includes(code) ? '*内部*' : ''}\n`
       } else if (res.helpResult.code === '8') {
         console.log('上限')
         break
       } else if (res.helpResult.code === '9') {
         console.log('已助力')
+        log.help += `已助力 ${code} ${shareCodeSelf.includes(code) ? '*内部*' : ''}\n`
       } else if (res.helpResult.code === '10') {
         console.log('已满')
       } else if (res.helpResult.remainTimes === 0) {
@@ -100,6 +107,8 @@ let message: string = ''
     console.log(message)
     console.log('===================')
   }
+  console.log(log.help)
+  console.log(log.runTimes)
 })()
 
 async function api(fn: string, body: object) {
