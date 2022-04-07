@@ -45,6 +45,7 @@ let nowTime = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 
       }
     }
 
+    /*
     console.log('助力排队:', $.temp)
     for (let i = 0; i < cookiesArr.length; i++) {
       cookie = cookiesArr[i];
@@ -65,6 +66,7 @@ let nowTime = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 
         }
       }
     }
+    */
 
     for (let i = 0; i < cookiesArr.length; i++) {
       if (cookiesArr[i]) {
