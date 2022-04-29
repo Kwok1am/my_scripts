@@ -1,16 +1,15 @@
 /**
  * 汪汪乐园-跑步
- * 默认翻倍到0.04红包结束
- * export JD_JOY_PARK_RUN_ASSETS="0.04"
- * cron: 20,50 * * * *
+ * 默认翻倍到0.08红包结束
+ * export JD_JOY_PARK_RUN_ASSETS="0.08"
+ * cron: 20 * * * *
  */
 
 import {get, post, o2s, requireConfig, wait} from './TS_USER_AGENTS'
-import {geth5st, requestAlgo} from "./utils/V3";
-import {SHA256} from "crypto-js";
+import {H5ST} from "./h5st"
 
 let cookie: string = '', res: any = '', data: any, UserName: string
-let assets: number = parseFloat(process.env.JD_JOY_PARK_RUN_ASSETS || '0.04')
+let assets: number = parseFloat(process.env.JD_JOY_PARK_RUN_ASSETS || '0.08')
 
 !(async () => {
   let cookiesArr: string[] = await requireConfig()
@@ -19,31 +18,12 @@ let assets: number = parseFloat(process.env.JD_JOY_PARK_RUN_ASSETS || '0.04')
     UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
     console.log(`\n开始【京东账号${index + 1}】${UserName}\n`)
 
-    /*
-    res = await api('apTaskList', {"linkId": "LsQNxL7iWDlXUs6cFl-AAg"})
-    o2s(res)
-    for (let t of res.data) {
-      if (t.id === 662 && t.taskDoTimes < t.taskLimitTimes) {
-        console.log(t.taskShowTitle)
-        data = await api('apDoTask', {"taskType": t.taskType, "taskId": t.id, "itemId": t.taskSourceUrl, "linkId": "LsQNxL7iWDlXUs6cFl-AAg"})
-        await wait(1000)
-        o2s(data)
-      }
-      if (t.canDrawAwardNum === 1) {
-        data = await api('apTaskDrawAward', {"taskType": t.taskType, "taskId": t.id, "linkId": "LsQNxL7iWDlXUs6cFl-AAg"})
-        o2s(data)
-        // console.log('任务完成', parseInt(data.data.awardGivenNumber))
-        await wait(1000)
-      }
-    }
-
-     */
-
     res = await runningPageHome()
-    console.log('能量恢复中', secondsToMinutes(res.data.runningHomeInfo.nextRunningTime / 1000), '能量棒', res.data.runningHomeInfo.energy)
-    await wait(1000)
+    o2s(res)
 
-    if (res.data.runningHomeInfo.nextRunningTime / 1000 < 300) {
+    console.log('能量恢复中', secondsToMinutes(res.data.runningHomeInfo.nextRunningTime / 1000), '能量棒', res.data.runningHomeInfo.energy)
+
+    if (res.data.runningHomeInfo.nextRunningTime && res.data.runningHomeInfo.nextRunningTime / 1000 < 300) {
       await wait(res.data.runningHomeInfo.nextRunningTime)
       res = await runningPageHome()
       console.log('能量恢复中', secondsToMinutes(res.data.runningHomeInfo.nextRunningTime / 1000), '能量棒', res.data.runningHomeInfo.energy)
@@ -51,7 +31,6 @@ let assets: number = parseFloat(process.env.JD_JOY_PARK_RUN_ASSETS || '0.04')
     }
 
     if (!res.data.runningHomeInfo.nextRunningTime) {
-      await requestAlgo('b6ac3', 'jdltapp;')
       console.log('终点目标', assets)
       for (let i = 0; i < 10; i++) {
         res = await api('runningOpenBox', {"linkId": "L-sOanK_5RJCz7I314FpnQ"})
@@ -64,8 +43,10 @@ let assets: number = parseFloat(process.env.JD_JOY_PARK_RUN_ASSETS || '0.04')
         } else {
           if (res.data.doubleSuccess) {
             console.log('翻倍成功', parseFloat(res.data.assets))
+            await wait(5000)
           } else if (!res.data.doubleSuccess && !res.data.runningHomeInfo.runningFinish) {
             console.log('开始跑步', parseFloat(res.data.assets))
+            await wait(5000)
           } else {
             console.log('翻倍失败')
             break
@@ -82,29 +63,30 @@ let assets: number = parseFloat(process.env.JD_JOY_PARK_RUN_ASSETS || '0.04')
 })()
 
 async function api(fn: string, body: object) {
-  let timestamp: number = Date.now(), t: { key: string, value: string } [] = [
-    {key: 'functionId', value: fn},
-    {key: 'body', value: SHA256(JSON.stringify(body)).toString()},
-    {key: 't', value: timestamp.toString()},
-    {key: 'client', value: 'ios'},
-    {key: 'clientVersion', value: '3.8.16'}
-  ]
-  let h5st: string = ''
+  let timestamp: number = Date.now(), h5st: string = ''
   if (fn === 'runningOpenBox') {
-    h5st = geth5st(t, 'b6ac3')
+    let t: { key: string, value: string }[] = [
+      {key: "appid", value: "activities_platform"},
+      {key: "body", value: JSON.stringify(body)},
+      {key: "client", value: "ios"},
+      {key: "clientVersion", value: "3.1.0"},
+      {key: "functionId", value: "runningOpenBox"},
+      {key: "t", value: timestamp.toString()}
+    ]
+    h5st = await new H5ST(t, 'b6ac3', 'jdltapp;', '1804945295425750').__run()
   }
-  return post('https://api.m.jd.com/', `functionId=${fn}&body=${JSON.stringify(body)}&_t=${Date.now()}&appid=activities_platform&h5st=${h5st}`, {
-    'Host': 'api.m.jd.com',
-    'Origin': 'https://joypark.jd.com',
-    'User-Agent': 'jdltapp;',
-    'Referer': 'https://joypark.jd.com/',
-    'Content-Type': 'application/x-www-form-urlencoded',
-    'Cookie': cookie
+  return await post('https://api.m.jd.com/', `functionId=${fn}&body=${JSON.stringify(body)}&t=${timestamp}&appid=activities_platform&client=ios&clientVersion=3.1.0&h5st=${h5st}&cthr=1`, {
+    'authority': 'api.m.jd.com',
+    'content-type': 'application/x-www-form-urlencoded',
+    'cookie': cookie,
+    'origin': 'https://h5platform.jd.com',
+    'referer': 'https://h5platform.jd.com/',
+    'user-agent': 'jdltapp;'
   })
 }
 
 async function runningPageHome() {
-  return get(`https://api.m.jd.com/?functionId=runningPageHome&body=%7B%22linkId%22:%22L-sOanK_5RJCz7I314FpnQ%22,%22isFromJoyPark%22:true,%22joyLinkId%22:%22LsQNxL7iWDlXUs6cFl-AAg%22%7D&t=${Date.now()}&appid=activities_platform&client=ios&clientVersion=3.8.16`, '', {
+  return get(`https://api.m.jd.com/?functionId=runningPageHome&body=%7B%22linkId%22:%22L-sOanK_5RJCz7I314FpnQ%22,%22isFromJoyPark%22:true,%22joyLinkId%22:%22LsQNxL7iWDlXUs6cFl-AAg%22%7D&t=${Date.now()}&appid=activities_platform&client=ios&clientVersion=3.1.0`, '', {
     'Host': 'api.m.jd.com',
     'Origin': 'https://h5platform.jd.com',
     'User-Agent': 'jdltapp;',
