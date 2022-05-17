@@ -4,6 +4,7 @@ on:
     - cron: 5 */2 * * *
   watch:
     types: started
+  workflow_dispatch:
 jobs:
   build:
     runs-on: Ubuntu-20.04  
@@ -53,21 +54,21 @@ jobs:
         #rm -rf ./Wenmoux
         echo "========= 开始下载JDHelloWorld的脚本 ========="
         git clone -b main https://github.com/JDHelloWorld/jd_scripts.git ./JDHelloWorld
-        rm -r ./JDHelloWorld/jd_cfd*.ts ./JDHelloWorld/jd_getUp.ts  ./JDHelloWorld/jd_jxmc.ts ./JDHelloWorld/jd_bean_change.js ./JDHelloWorld/jd_喂猪.ts ./JDHelloWorld/jd_jxScore.ts  ./JDHelloWorld/jd_jxmc_stock.ts
-        rm -rf ./JDHelloWorld/jd_getShareCodes.ts ./JDHelloWorld/jd_jxgc_help.ts ./JDHelloWorld/jd_joy_reward.ts ./JDHelloWorld/jd_qq_pasture.ts ./JDHelloWorld/jd_speed_redEnvelope.ts ./JDHelloWorld/jx_box.ts
+        rm -r ./JDHelloWorld/jd_cfd*.ts ./JDHelloWorld/jd_jxmc.ts  ./JDHelloWorld/jd_jxmc_stock.ts
+        rm -rf ./JDHelloWorld/jd_getShareCodes.ts  ./JDHelloWorld/jd_speed_redEnvelope.ts 
         #mv ./JDHelloWorld/githubAction.md ./githubAction.md
         cp -f ./JDHelloWorld/sendNotify.js ./sendNotify.js
         mv ./JDHelloWorld/utils/*.json ./utils/
         mv ./JDHelloWorld/utils/*.js ./utils/
         cp -f ./JDHelloWorld/utils/*.ts ./utils/
         cd ./JDHelloWorld
-        echo "========= 开始安装依赖 ========="
-        sudo npm install
-        echo "========= 开始转换JDHelloWorld的ts ========="
-        tsc ./*.ts --downlevelIteration
+        #echo "========= 开始安装依赖 ========="
+        #sudo npm install
+        #echo "========= 开始转换JDHelloWorld的ts ========="
+        #tsc ./*.ts --downlevelIteration
         cd ..
         cp -f ./JDHelloWorld/*_*.js ./
-        cp -f ./JDHelloWorld/*_*.ts ./activity
+        cp -f ./JDHelloWorld/*_*.ts ./
         rm -rf ./JDHelloWorld
     - name: 'Commit Files'
       id: commit

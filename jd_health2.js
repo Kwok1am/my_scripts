@@ -1,5 +1,4 @@
 /*
-author: 疯疯
 东东健康社区
 更新时间：2021-4-22
 活动入口：京东APP首页搜索 "玩一玩"即可
@@ -20,16 +19,15 @@ cron "13 1,6,22 * * *" script-path=jd_health2.js, tag=东东健康社区
 ============小火箭=========
 东东健康社区 = type=cron,script-path=jd_health2.js, cronexpr="13 1,6,22 * * *", timeout=3600, enable=true
  */
-const {accessSync, readFileSync} = require("fs");
-const path = require("path");
+
 const $ = new Env("东东健康社区");
 
 console.log('\n====================Hello World====================\n')
 
 const jdCookieNode = $.isNode() ? require("./jdCookie.js") : "";
 let cookiesArr = [], cookie = "", message;
-const inviteCodes = ['']
-const randomCount = $.isNode() ? 20 : 5;
+// const inviteCodes = ['']
+// const randomCount = $.isNode() ? 20 : 5;
 if ($.isNode()) {
   Object.keys(jdCookieNode).forEach((item) => {
     cookiesArr.push(jdCookieNode[item]);
@@ -72,7 +70,7 @@ const JD_API_HOST = "https://api.m.jd.com/client.action";
         }
       }
 
-      await shareCodesFormat()
+      // await shareCodesFormat()
       await main()
       await showMsg()
     }
@@ -99,7 +97,7 @@ async function main() {
       await $.wait(1000)
     }
     await collectScore()
-    await helpFriends()
+    // await helpFriends()
     await getTaskDetail(22);
     await getTaskDetail(-1)
   } catch (e) {
@@ -107,6 +105,7 @@ async function main() {
   }
 }
 
+/*
 async function helpFriends() {
   for (let code of $.newShareCodes) {
     if (!code) continue
@@ -119,6 +118,7 @@ async function helpFriends() {
     await $.wait(1000)
   }
 }
+*/
 
 function showMsg() {
   return new Promise(async resolve => {
@@ -148,15 +148,6 @@ function getTaskDetail(taskId = '') {
               if (data?.data?.result?.taskVos) {
                 console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${data?.data?.result?.taskVos[0].assistTaskDetailVo.taskToken}\n`);
                 $.code = data?.data?.result?.taskVos[0].assistTaskDetailVo.taskToken || '';
-
-                for (let k = 0; k < 3; k++) {
-                  try {
-                    await runTimes()
-                    break
-                  } catch (e) {
-                  }
-                  await $.wait(Math.floor(Math.random() * 10 + 3) * 1000)
-                }
               }
             } else if (taskId === 22) {
               console.log(`${data?.data?.result?.taskVos[0]?.taskName}任务，完成次数：${data?.data?.result?.taskVos[0]?.times}/${data?.data?.result?.taskVos[0]?.maxTimes}`)
@@ -192,22 +183,6 @@ function getTaskDetail(taskId = '') {
           resolve()
         }
       })
-  })
-}
-
-function runTimes() {
-  return new Promise((resolve, reject) => {
-    $.get({
-      url: `https://api.jdsharecode.xyz/api/runTimes?activityId=health&sharecode=${$.code}`
-    }, (err, resp, data) => {
-      if (err) {
-        console.log('上报失败', err)
-        reject(err)
-      } else {
-        console.log(data)
-        resolve()
-      }
-    })
   })
 }
 
@@ -288,6 +263,7 @@ function safeGet(data) {
   }
 }
 
+/*
 function readShareCode() {
   console.log(`开始`)
   return new Promise(async resolve => {
@@ -335,6 +311,7 @@ function shareCodesFormat() {
     resolve();
   })
 }
+*/
 
 function requireConfig() {
   return new Promise(resolve => {
