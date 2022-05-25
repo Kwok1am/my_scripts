@@ -1,76 +1,62 @@
 /**
- * 清空购物车
+ * export DELETE_CART_WHITELIST="name1&name2"
  */
 
-import axios from 'axios'
-import {post, getRandomNumberByRange, getCookie, wait} from './TS_USER_AGENTS'
+import {User, JDHelloWorld} from "./TS_JDHelloWorld";
 
-let cookie: string = '', res: any = '', UserName: string, index: number
-let UA: string = `jdapp;JD4iPhone/167724 (iPhone; iOS ${getRandomNumberByRange(12, 16)}.${getRandomNumberByRange(0, 4)}; Scale/3.00)`
+class Jd_deleteCart extends JDHelloWorld {
+  constructor() {
+    super();
+  }
 
-!(async () => {
-  let cookiesArr: string[] = await getCookie()
-  for (let i = 0; i < cookiesArr.length; i++) {
-    cookie = cookiesArr[i]
-    UserName = decodeURIComponent(cookie.match(/pt_pin=([^;]*)/)![1])
-    index = i + 1
-    console.log(`\n开始【京东账号${index}】${UserName}\n`)
+  async init() {
+    await this.run(this)
+  }
 
-    res = await getCartData();
-    let areaId: string = res.areaId, traceId: string = res.traceId, delCount: number = 0, cartCount: number = parseInt(res.cartJson.num), venderCart: any = res.cart.venderCart
+  async main(user: User) {
+    let whiteList: string[] = process.env.DELETE_CART_WHITELIST
+      ? process.env.DELETE_CART_WHITELIST.split('&')
+      : []
+    let res: any = await this.get('https://p.m.jd.com/cart/cart.action?fromnav=1', {
+      'Host': 'p.m.jd.com',
+      'User-Agent': user.UserAgent,
+      'Referer': 'https://m.jd.com/',
+      cookie: user.cookie
+    })
+    res = JSON.parse(res.match(/window\.cartData = ([^;]*)/)[1])
 
-    console.log('购物车有', cartCount, '件商品')
-
-    if (cartCount > 0) {
-      for (let vender of venderCart) {
-        for (let sortedItem of vender.sortedItems) {
-          let pid: string = sortedItem.polyItem?.promotion?.pid, postBody: string = ''
-
-          for (let p of sortedItem.polyItem.products) {
-            let commlist: string = p.mainSku.id, name: string = p.mainSku.name, skuUuid: string = p.skuUuid
-            console.log('开始删除', name)
-
-            if (pid)
-              postBody = `pingouchannel=0&commlist=${commlist},,1,${commlist},11,${pid},0,skuUuid:${skuUuid}@@useUuid:0&type=0&checked=0&locationid=1-72-2819-0&templete=1&reg=1&scene=0&version=20190418&traceid=1382552434001752779&tabMenuType=1&sceneval=2`
-            else
-              postBody = `pingouchannel=0&commlist=${commlist},,1,${commlist},1,,0,skuUuid:${skuUuid}@@useUuid:0&type=0&checked=0&locationid=${areaId}&templete=1&reg=1&scene=0&version=20190418&traceid=${traceId}&tabMenuType=1&sceneval=2`;
+    let venderCart = res.cart.venderCart, areaId: string = res.addrInfo.areaId
+    for (let vender of venderCart) {
+      let postBody: string = ''
+      for (let sortedItem of vender.sortedItems) {
+        let pid: string = sortedItem.polyItem?.promotion?.pid
+        for (let p of sortedItem.polyItem.products) {
+          let commlist: string = p.mainSku.id, name: string = p.mainSku.name, skuUuid: string = p.skuUuid
+          let pass: boolean = whiteList.some(item => name.includes(item))
+          if (!pass) {
+            pid
+              ? postBody += `${commlist},,1,${commlist},11,${pid},0,skuUuid:${skuUuid}@@useUuid:0$`
+              : postBody += `${commlist},,1,${commlist},1,,0,skuUuid:${skuUuid}@@useUuid:0$`;
           }
-
-          res = await post('https://wq.jd.com/deal/mshopcart/rmvCmdy?sceneval=2&g_login_type=1&g_ty=ajax', postBody, {
-            'authority': 'wq.jd.com',
-            'accept': 'application/json',
-            'user-agent': UA,
-            'content-type': 'application/x-www-form-urlencoded',
-            'origin': 'https://p.m.jd.com',
-            'referer': 'https://p.m.jd.com/',
-            'cookie': cookie
-          })
-          if (res.errId === '0') {
-            console.log('删除成功✅')
-            delCount++
-            await wait(1000)
-          } else {
-            console.log(res.errMsg)
-            break
-          }
+          console.log(pass, name)
         }
       }
-      console.log('删除完成，共删除', delCount, '件商品')
-      if (delCount === cartCount)
-        console.log('购物车已清空')
+      if (postBody) {
+        res = await this.post('https://api.m.jd.com/client.action/deal/mshopcart/rmvcmdy/m?sceneval=2&g_login_type=1&g_ty=ajax',
+          `body={"tenantCode":"jgm","bizModelCode":"1","bizModeClientType":"M","externalLoginType":1,"platform":3,"pingouchannel":0,"commlist":${JSON.stringify(postBody)},"type":0,"checked":0,"locationid":"${areaId}","templete":1,"reg":1,"scene":0,"version":"20190418","traceid":"","sceneval":2}&loginType=2&loginWQBiz=golden-trade&appid=m_core&platform=3&functionId=deal_mshopcart_rmvcmdy_m&uuid=${this.getRandomNumString(17)}&osVersion=&screen=jdm&d_brand=&d_model=&lang=zh_CN`, {
+            'Host': 'api.m.jd.com',
+            'Cookie': user.cookie,
+            'accept': 'application/json',
+            'content-type': 'application/x-www-form-urlencoded',
+            'origin': 'https://p.m.jd.com',
+            'user-agent': user.UserAgent,
+            'referer': 'https://p.m.jd.com/'
+          })
+        res.errId === '0' ? console.log('删除成功✅') : console.log(res.errMsg)
+        await this.wait(2000)
+      }
     }
   }
-})()
-
-async function getCartData() {
-  let {data} = await axios.get('https://p.m.jd.com/cart/cart.action?fromnav=1', {
-    headers: {
-      'Host': 'p.m.jd.com',
-      'User-Agent': UA,
-      'Referer': 'https://m.jd.com/',
-      cookie: cookie
-    }
-  })
-  data = data.match(/window\.cartData =([\s\S]*)window\._PFM_TIMING\[2] /)[1].replace(/\s*/g, '')
-  return JSON.parse(data)
 }
+
+new Jd_deleteCart().init().then()
