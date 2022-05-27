@@ -68,10 +68,18 @@ let shareCodeHW: string[] = [], shareCodeSelf: string  [] = [], shareCode: strin
       } else {
         shareCode = Array.from(new Set([...shareCodeSelf, ...shareCodeHW]))
       }
+
       for (let code of shareCode) {
         console.log('去助力', code)
         log = await tool.main()
-        res = await api('promote_pk_collectPkExpandScore', {"ss": JSON.stringify({extraData: {log: encodeURIComponent(log.log), sceneid: 'RAhomePageh5'}, secretp: secretp, random: log.random}), "actionType": "0", "inviteId": code})
+        res = await api('promote_pk_collectPkExpandScore', {
+          "ss": JSON.stringify({
+            extraData: {
+              log: encodeURIComponent('1653654849718~1EMbq0fH5CYMDJnU2pmajAxMQ==.VmVfVVxSZ1JSUlNgXxgDDjRTVw9RZFgsFFZ/XUorS2EUVBRWLRISCRQgOFYHNwMtMRMXAANeHggeP1ErGQ==.b509efa5~A,2~DAFE94A29CE5A08937BB9CD8D0EC27DE81F3FF9E928D54AD41133F880BE1A735~0uw9wza~C~ShoQDhcNajgfGkZbDBMCPz4ZFVYXXRoIBE0TSxdBDxUAUwYLBABVCQxcUgcFA1IADBAZQ0ZdAEEPFUURR15UUxRXGkhBQlJQRwkaRlMVUE0QFlQVHUdDXFwXW2oBSFIBGwNJABQAGVFsFEYJXxULVB8aUUZDCxpSUgEFUFdQWlENA1QAAVABBAAGAAELUFMHAVNUBwEHVBEUEFsREwJGLlRUeAtHXV4XTRNMRlkEAQRWBQ0GDVUID1VbGRVbDhECEFRDHRoCE1cVC0dDcFxDVVN2ERVXXgMhdUB5ABFHXi8qdBUdR11OEA9DdlcLBFlSESxdWxwXTRNWBRUXDRNUBQACDFQTFEYQVkUTX2gJAANRHQpWVwVqHUdBVxAPOhNZRk8XVhNJEVkQGUNQGkhBVBUdR1IaHhcAE2VIQVxYUEcJGlRTB1deAhdBFR1HUlIQD0NEGkhBVl4TXxFPARtUHwxGTxdUVzpFGggXUQAaSEFXUxNfEUpTWwVeVVkEUGV1UgtrShdNE1UOQQ9sAUkDFAJoTRNaCAxSFQtHUhoeFwxCX0ZZF1YTGA==~1ubi403'),
+              sceneid: 'RAhomePageh5'
+            }, secretp: secretp, random: 'geRD78Sx'
+          }), "actionType": "0", "inviteId": code
+        })
         console.log(res.data.bizMsg)
         await wait(4000)
       }
